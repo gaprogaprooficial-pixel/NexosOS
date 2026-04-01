@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexosOS</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+#os{width:100vw;height:100vh;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);position:relative;overflow:hidden;}
+
+/* ── Taskbar ── */
+#taskbar{position:absolute;bottom:0;left:0;right:0;height:48px;background:rgba(10,10,25,0.95);border-top:0.5px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 10px;gap:6px;z-index:1000;}
+#start-btn{width:40px;height:40px;border-radius:10px;border:none;background:rgba(99,102,241,0.85);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+#start-btn:hover{background:rgb(99,102,241);}
+.tsep{width:0.5px;height:26px;background:rgba(255,255,255,0.12);margin:0 4px;flex-shrink:0;}
+#tb-apps{display:flex;gap:4px;flex:1;overflow:hidden;}
+.tb-btn{height:36px;padding:0 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.06);cursor:pointer;color:#fff;font-size:12px;white-space:nowrap;transition:background .15s;}
+.tb-btn:hover{background:rgba(255,255,255,0.13);}
+.tb-btn.active{background:rgba(99,102,241,0.38);border-bottom:2px solid #818cf8;}
+#tb-clock{margin-left:auto;color:rgba(255,255,255,0.85);font-size:12px;text-align:right;padding-right:6px;line-height:1.5;flex-shrink:0;}
+#tb-date{font-size:10px;color:rgba(255,255,255,0.4);}
+
+/* ── Desktop icons ── */
+.dico{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px;border-radius:10px;width:76px;transition:background .12s;}
+.dico:hover{background:rgba(255,255,255,0.11);}
+.dico .di{font-size:34px;line-height:1;}
+.dico .dl{font-size:11px;color:#fff;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.9);line-height:1.3;}
+
+/* ── Start menu ── */
+#smenu{position:absolute;bottom:54px;left:10px;width:310px;background:rgba(18,18,38,0.98);border-radius:14px;border:0.5px solid rgba(255,255,255,0.1);z-index:2000;padding:14px;display:none;flex-direction:column;gap:4px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+#smenu.open{display:flex;}
+#sm-q{width:100%;padding:9px 14px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:9px;color:#fff;font-size:13px;outline:none;}
+#sm-q::placeholder{color:rgba(255,255,255,.3);}
+.smsec{font-size:10px;color:rgba(255,255,255,.3);margin:8px 0 2px;text-transform:uppercase;letter-spacing:.1em;}
+.smit{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .12s;}
+.smit:hover{background:rgba(255,255,255,.09);}
+.smit .sico{font-size:20px;}
+.smit .snm{color:#fff;font-size:13px;}
+.smfoot{border-top:0.5px solid rgba(255,255,255,.08);margin-top:6px;padding-top:10px;display:flex;gap:6px;}
+.smfoot .smit{flex:1;justify-content:center;}
+
+/* ── Windows ── */
+.win{position:absolute;background:#1a1a2e;border-radius:14px;border:0.5px solid rgba(255,255,255,.1);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.7);display:flex;flex-direction:column;}
+.wbar{height:38px;background:rgba(255,255,255,.04);display:flex;align-items:center;padding:0 14px;gap:8px;cursor:grab;border-bottom:0.5px solid rgba(255,255,255,.06);flex-shrink:0;user-select:none;}
+.wbar:active{cursor:grabbing;}
+.wbtn{width:13px;height:13px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;}
+.wclose{background:#ff5f57;}.wmin{background:#ffbd2e;}.wmax{background:#28c840;}
+.wtitle{color:rgba(255,255,255,.65);font-size:12px;font-weight:500;margin-left:4px;}
+.wbody{flex:1;overflow:auto;}
+
+/* ── File Explorer ── */
+.fe-wrap{display:flex;height:100%;}
+.fe-side{width:155px;background:rgba(0,0,0,.22);padding:10px 8px;border-right:0.5px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;flex-direction:column;gap:2px;}
+.fe-nav{padding:7px 10px;border-radius:7px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .1s;}
+.fe-nav:hover{background:rgba(255,255,255,.08);color:#fff;}
+.fe-nav.on{background:rgba(99,102,241,.2);color:#818cf8;}
+.fe-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.fe-toolbar{padding:8px 12px;background:rgba(0,0,0,.15);border-bottom:0.5px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.fe-path{font-size:11px;color:rgba(255,255,255,.4);flex:1;}
+.fe-savebtn{background:rgba(99,102,241,.3);border:0.5px solid rgba(129,140,248,.4);color:#c7d2fe;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;white-space:nowrap;}
+.fe-savebtn:hover{background:rgba(99,102,241,.5);}
+.fe-grid{flex:1;padding:14px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;overflow-y:auto;}
+.fe-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 8px;border-radius:9px;width:76px;transition:background .1s;}
+.fe-item:hover{background:rgba(255,255,255,.09);}
+.fe-item .fii{font-size:28px;line-height:1;}
+.fe-item .fin{font-size:10px;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;word-break:break-word;}
+.fe-item.sel{background:rgba(99,102,241,.25);}
+.fe-empty{color:rgba(255,255,255,.25);font-size:13px;padding:20px;text-align:center;width:100%;}
+
+/* ── Terminal ── */
+#term-wrap{background:#0a0a0a;padding:14px;font-family:'Courier New',monospace;font-size:13px;color:#00ff88;height:100%;overflow-y:auto;display:flex;flex-direction:column;}
+.tl{margin-bottom:3px;word-break:break-word;line-height:1.5;}
+.tprompt{color:#818cf8;}.tcmd{color:rgba(255,255,255,.6);}.terr{color:#fca5a5;}.tinfo{color:#a5b4fc;}
+#term-row{display:flex;align-items:center;gap:6px;margin-top:4px;flex-shrink:0;}
+#term-in{background:transparent;border:none;outline:none;color:#00ff88;font-family:inherit;font-size:13px;flex:1;caret-color:#00ff88;}
+
+/* ── Notes ── */
+.note-wrap{height:100%;display:flex;flex-direction:column;}
+.note-bar{background:rgba(0,0,0,.25);padding:7px 12px;display:flex;gap:8px;border-bottom:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
+.note-bar button{background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.85);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;}
+.note-bar button:hover{background:rgba(255,255,255,.14);}
+#note-ta{flex:1;background:#111122;color:rgba(255,255,255,.88);border:none;outline:none;padding:18px;font-size:14px;resize:none;line-height:1.8;font-family:inherit;}
+#note-st{background:rgba(0,0,0,.2);padding:4px 14px;font-size:10px;color:rgba(255,255,255,.3);border-top:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
+
+/* ── Calculator ── */
+.calc-wrap{height:100%;background:#111122;display:flex;flex-direction:column;padding:16px;gap:12px;}
+.calc-disp{background:rgba(0,0,0,.5);border-radius:12px;padding:16px 18px;text-align:right;flex-shrink:0;}
+.calc-hist{font-size:13px;color:rgba(255,255,255,.38);min-height:20px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.calc-cur{font-size:36px;color:#fff;font-weight:300;letter-spacing:-1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(5,1fr);gap:8px;flex:1;}
+.cb{border:none;border-radius:10px;cursor:pointer;font-size:18px;font-weight:500;transition:opacity .1s,transform .1s;min-height:0;}
+.cb:hover{opacity:.82;}.cb:active{opacity:.6;transform:scale(.95);}
+.cb-num{background:rgba(255,255,255,.1);color:#fff;}
+.cb-op{background:rgba(129,140,248,.3);color:#c7d2fe;}
+.cb-eq{background:#6366f1;color:#fff;}
+.cb-ac{background:rgba(239,68,68,.25);color:#fca5a5;}
+.cb-sp{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);}
+.cb-zero{grid-column:span 2;}
+
+/* ── Settings ── */
+.set-wrap{display:flex;height:100%;}
+.set-nav{width:165px;background:rgba(0,0,0,.22);padding:10px 8px;border-right:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
+.sni{padding:9px 12px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.65);cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .1s;}
+.sni:hover{background:rgba(255,255,255,.07);color:#fff;}
+.sni.on{background:rgba(99,102,241,.22);color:#a5b4fc;}
+.set-body{flex:1;padding:22px;overflow-y:auto;}
+.set-title{font-size:18px;color:#fff;font-weight:500;margin-bottom:18px;}
+.set-lbl{font-size:10px;color:rgba(255,255,255,.38);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em;}
+.set-sec{margin-bottom:20px;}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(255,255,255,.04);border-radius:9px;margin-bottom:4px;}
+.set-rl{font-size:13px;color:rgba(255,255,255,.82);}
+.tog{width:40px;height:22px;background:rgba(255,255,255,.15);border-radius:11px;position:relative;cursor:pointer;transition:background .22s;flex-shrink:0;}
+.tog.on{background:#6366f1;}
+.tth{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .22s;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.tog.on .tth{left:21px;}
+.sslider{width:100%;accent-color:#6366f1;}
+
+/* ── Music ── */
+.music-wrap{height:100%;background:linear-gradient(160deg,#1e1b4b,#111827);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;}
+.mdisc{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:38px;}
+.mdisc.spin{animation:dspin 6s linear infinite;}
+@keyframes dspin{to{transform:rotate(360deg);}}
+.mname{color:#fff;font-size:15px;font-weight:500;text-align:center;}
+.mart{color:rgba(255,255,255,.45);font-size:12px;text-align:center;}
+.mprog{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.mfill{height:100%;background:#6366f1;border-radius:2px;transition:width .3s linear;width:0%;}
+.mctrl{display:flex;gap:16px;align-items:center;}
+.mc{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;transition:color .1s,transform .1s;line-height:1;}
+.mc:hover{color:#fff;transform:scale(1.1);}
+.mcplay{background:#6366f1;border-radius:50%;width:46px;height:46px;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff!important;}
+
+/* ── App Store / Lanzadas ── */
+.store-wrap{height:100%;display:flex;flex-direction:column;}
+.store-tabs{display:flex;gap:0;border-bottom:0.5px solid rgba(255,255,255,.08);flex-shrink:0;}
+.stab{flex:1;padding:10px;background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;transition:color .15s,border-bottom .15s;border-bottom:2px solid transparent;}
+.stab:hover{color:#fff;}
+.stab.on{color:#818cf8;border-bottom:2px solid #818cf8;}
+.store-panel{flex:1;overflow-y:auto;padding:16px;}
+/* App grid */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:14px;}
+.app-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.07);cursor:pointer;transition:background .1s,border-color .1s;}
+.app-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.15);}
+.app-card .aco{font-size:32px;line-height:1;}
+.app-card .acn{font-size:11px;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;word-break:break-word;}
+.app-card .acd{font-size:9px;color:rgba(99,102,241,.8);margin-top:2px;}
+/* Add app form */
+.add-form{background:rgba(0,0,0,.2);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.add-form label{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:2px;display:block;text-transform:uppercase;letter-spacing:.06em;}
+.add-form input,.add-form textarea,.add-form select{width:100%;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;font-family:inherit;}
+.add-form textarea{resize:vertical;min-height:80px;font-family:'Courier New',monospace;font-size:12px;}
+.add-form input:focus,.add-form textarea:focus{border-color:rgba(129,140,248,.5);}
+.add-btn{background:#6366f1;border:none;color:#fff;padding:10px 0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;transition:background .15s;width:100%;}
+.add-btn:hover{background:#4f46e5;}
+.del-btn{background:rgba(239,68,68,.2);border:0.5px solid rgba(239,68,68,.3);color:#fca5a5;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:10px;}
+.del-btn:hover{background:rgba(239,68,68,.35);}
+.app-card-wrap{position:relative;}
+.app-card-wrap .del-btn{position:absolute;top:4px;right:4px;padding:2px 7px;}
+/* custom iframe app */
+.iframe-wrap{height:100%;display:flex;flex-direction:column;}
+.iframe-wrap iframe{flex:1;border:none;background:#fff;}
+
+/* ── Notification ── */
+#notif{position:fixed;top:14px;right:14px;z-index:9999;background:rgba(18,18,42,.98);border:0.5px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;max-width:260px;transform:translateX(290px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+#notif.show{transform:translateX(0);}
+#noti{font-size:16px;margin-bottom:3px;}
+#nott{font-size:12px;color:#fff;font-weight:600;}
+#notm{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* ── Context menu ── */
+#ctx{position:fixed;background:rgba(18,18,38,.98);border:0.5px solid rgba(255,255,255,.1);border-radius:10px;padding:6px;z-index:8000;display:none;min-width:185px;box-shadow:0 16px 50px rgba(0,0,0,.6);}
+.cxi{padding:8px 14px;border-radius:7px;font-size:12px;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:10px;}
+.cxi:hover{background:rgba(255,255,255,.09);color:#fff;}
+.cxs{height:0.5px;background:rgba(255,255,255,.08);margin:4px 0;}
+
+/* ── Shutdown ── */
+#shutdown{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:99999;}
+#shutdown.show{display:flex;}
+</style>
+</head>
+<body>
+<div id="os">
+  <!-- Desktop icons -->
+  <div class="dico" style="top:18px;left:16px"  ondblclick="openApp('files')">   <div class="di">📁</div><div class="dl">Archivos</div></div>
+  <div class="dico" style="top:106px;left:16px" ondblclick="openApp('terminal')"><div class="di">💻</div><div class="dl">Terminal</div></div>
+  <div class="dico" style="top:194px;left:16px" ondblclick="openApp('notes')">   <div class="di">📝</div><div class="dl">Notas</div></div>
+  <div class="dico" style="top:282px;left:16px" ondblclick="openApp('calc')">    <div class="di">🧮</div><div class="dl">Calculadora</div></div>
+  <div class="dico" style="top:370px;left:16px" ondblclick="openApp('music')">   <div class="di">🎵</div><div class="dl">Música</div></div>
+  <div class="dico" style="top:458px;left:16px" ondblclick="openApp('settings')"><div class="di">⚙️</div><div class="dl">Ajustes</div></div>
+  <div class="dico" style="top:18px;right:16px" ondblclick="openApp('store')">   <div class="di">🚀</div><div class="dl">Apps</div></div>
+
+  <!-- Start menu -->
+  <div id="smenu">
+    <input type="text" id="sm-q" placeholder="🔍  Buscar aplicación..." oninput="smFilter(this.value)">
+    <div class="smsec">Sistema</div>
+    <div class="smit" onclick="openApp('files');smClose()">   <span class="sico">📁</span><span class="snm">Explorador de Archivos</span></div>
+    <div class="smit" onclick="openApp('terminal');smClose()"><span class="sico">💻</span><span class="snm">Terminal</span></div>
+    <div class="smit" onclick="openApp('notes');smClose()">   <span class="sico">📝</span><span class="snm">Editor de Notas</span></div>
+    <div class="smit" onclick="openApp('calc');smClose()">    <span class="sico">🧮</span><span class="snm">Calculadora</span></div>
+    <div class="smit" onclick="openApp('music');smClose()">   <span class="sico">🎵</span><span class="snm">Reproductor de Música</span></div>
+    <div class="smit" onclick="openApp('settings');smClose()"><span class="sico">⚙️</span><span class="snm">Ajustes del Sistema</span></div>
+    <div class="smit" onclick="openApp('store');smClose()">   <span class="sico">🚀</span><span class="snm">Apps Lanzadas</span></div>
+    <div id="sm-custom-list"></div>
+    <div class="smfoot">
+      <div class="smit" onclick="doShutdown()"><span class="sico">🔴</span><span class="snm">Apagar</span></div>
+      <div class="smit" onclick="smClose()">   <span class="sico">🔒</span><span class="snm">Bloquear</span></div>
+    </div>
+  </div>
+
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <button id="start-btn" onclick="smToggle()">⊞</button>
+    <div class="tsep"></div>
+    <div id="tb-apps"></div>
+    <div id="tb-clock"><div id="tb-time">--:--</div><div id="tb-date"></div></div>
+  </div>
+
+  <!-- Context menu -->
+  <div id="ctx">
+    <div class="cxi" onclick="ctxA('notes')">   📝 Nueva nota</div>
+    <div class="cxi" onclick="ctxA('files')">   📁 Explorador</div>
+    <div class="cxs"></div>
+    <div class="cxi" onclick="ctxA('settings')">⚙️ Ajustes</div>
+    <div class="cxs"></div>
+    <div class="cxi" onclick="doShutdown()">    🔴 Apagar</div>
+  </div>
+
+  <!-- Notification -->
+  <div id="notif"><div id="noti">🔔</div><div id="nott">NexosOS</div><div id="notm">Listo</div></div>
+</div>
+
+<!-- Shutdown -->
+<div id="shutdown">
+  <div style="font-size:54px">⊞</div>
+  <div style="font-size:17px;color:rgba(255,255,255,.55)" id="sd-txt">Apagando NexosOS...</div>
+</div>
+
+<script>
+// ══════════════ GLOBALS ══════════════
+var wins={}, zTop=10;
+var musicPlaying=false, musicPct=0, musicTimer=null, musicIdx=0;
+var songs=[{title:'Noche Digital',artist:'NexosOS Radio',ico:'🎶'},{title:'Luz Binaria',artist:'Synth Dreams',ico:'🌌'},{title:'Código Azul',artist:'Pixel Waves',ico:'🎸'}];
+var termHist=[], histIdx=-1;
+var C={cur:'0',prev:null,op:null,waitNext:false};
+
+// File system virtual
+var FS={
+  home:[
+    {t:'📁',n:'Documentos'},{t:'📁',n:'Imágenes'},{t:'📁',n:'Música'},
+    {t:'📁',n:'Videos'},{t:'📁',n:'Descargas'},{t:'📁',n:'Sistema'}
+  ],
+  docs:[
+    {t:'📄',n:'notas.txt'},{t:'📄',n:'informe.docx'},{t:'📊',n:'datos.xlsx'},
+    {t:'📄',n:'resumen.txt'},{t:'📄',n:'carta.pdf'},{t:'📄',n:'proyecto.docx'}
+  ],
+  images:[
+    {t:'🖼️',n:'foto_vacaciones.png'},{t:'🖼️',n:'perfil.jpg'},{t:'🖼️',n:'captura.png'},
+    {t:'🖼️',n:'wallpaper.jpg'},{t:'🖼️',n:'logo.svg'},{t:'🖼️',n:'banner.png'}
+  ],
+  music:[
+    {t:'🎵',n:'cancion.mp3'},{t:'🎵',n:'playlist.m3u'},{t:'🎵',n:'favoritos.mp3'},
+    {t:'🎵',n:'remix.wav'},{t:'🎵',n:'podcast.mp3'},{t:'🎶',n:'album'}
+  ],
+  videos:[
+    {t:'🎬',n:'pelicula.mp4'},{t:'🎬',n:'tutorial.avi'},{t:'🎥',n:'grabacion.mov'},
+    {t:'🎬',n:'clip.mp4'},{t:'🎬',n:'serie_ep1.mkv'},{t:'🎬',n:'intro.mp4'}
+  ],
+  downloads:[
+    {t:'📦',n:'app_setup.exe'},{t:'📦',n:'backup.zip'},{t:'📄',n:'manual.pdf'},
+    {t:'🖼️',n:'descarga.png'},{t:'📦',n:'archivo.tar.gz'},{t:'📄',n:'readme.txt'}
+  ],
+  system:[
+    {t:'🔧',n:'config.ini'},{t:'🔧',n:'system.log'},{t:'⚙️',n:'nexos.conf'},
+    {t:'📋',n:'boot.cfg'},{t:'🔑',n:'keys.dat'},{t:'📜',n:'license.txt'}
+  ],
+  trash:[]
+};
+var feSection='home';
+var feSelected=null;
+
+// Custom apps (persistidas en memoria)
+var customApps=[];
+
+// ══════════════ CLOCK ══════════════
+function tick(){
+  var n=new Date();
+  document.getElementById('tb-time').textContent=n.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('tb-date').textContent=n.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
+}
+tick(); setInterval(tick,5000);
+
+// ══════════════ NOTIFY ══════════════
+function notify(ico,title,msg){
+  document.getElementById('noti').textContent=ico;
+  document.getElementById('nott').textContent=title;
+  document.getElementById('notm').textContent=msg;
+  var el=document.getElementById('notif');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){ el.classList.remove('show'); },3200);
+}
+
+// ══════════════ START MENU ══════════════
+function smToggle(){ document.getElementById('smenu').classList.toggle('open'); }
+function smClose(){  document.getElementById('smenu').classList.remove('open'); }
+function smFilter(q){
+  document.querySelectorAll('#smenu .smit').forEach(function(el){
+    el.style.display=el.textContent.toLowerCase().indexOf(q.toLowerCase())>=0?'flex':'none';
+  });
+}
+function smRefreshCustom(){
+  var list=document.getElementById('sm-custom-list');
+  if(!list) return;
+  if(customApps.length===0){ list.innerHTML=''; return; }
+  var html='<div class="smsec">Mis Apps</div>';
+  customApps.forEach(function(app){
+    html+='<div class="smit" onclick="openCustomApp(\''+app.id+'\');smClose()"><span class="sico">'+app.ico+'</span><span class="snm">'+esc(app.name)+'</span></div>';
+  });
+  list.innerHTML=html;
+}
+
+// ══════════════ CONTEXT MENU ══════════════
+document.getElementById('os').addEventListener('contextmenu',function(e){
+  e.preventDefault();
+  var m=document.getElementById('ctx');
+  m.style.display='block';
+  m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+  m.style.top=Math.min(e.clientY,window.innerHeight-160)+'px';
+});
+document.addEventListener('click',function(e){
+  if(!document.getElementById('ctx').contains(e.target)) document.getElementById('ctx').style.display='none';
+  var sm=document.getElementById('smenu');
+  if(!sm.contains(e.target)&&e.target.id!=='start-btn') sm.classList.remove('open');
+});
+function ctxA(app){ document.getElementById('ctx').style.display='none'; openApp(app); }
+
+// ══════════════ WINDOW MANAGER ══════════════
+function openApp(id){
+  if(wins[id]){ focusWin(id); if(wins[id].min) unminWin(id); return; }
+  var cfg=APPS[id]; if(!cfg) return;
+  makeWin(id,cfg.title,cfg.w,cfg.h,cfg.html());
+  if(cfg.ready) setTimeout(cfg.ready,80);
+}
+function openCustomApp(id){
+  var app=customApps.find(function(a){ return a.id===id; });
+  if(!app) return;
+  var wid='capp_'+id;
+  if(wins[wid]){ focusWin(wid); if(wins[wid].min) unminWin(wid); return; }
+  var html='<div class="iframe-wrap"><iframe srcdoc="'+escAttr(app.html)+'"></iframe></div>';
+  makeWin(wid, app.ico+' '+app.name, 700, 500, html);
+}
+function makeWin(id,title,w,h,bodyHtml){
+  var el=document.createElement('div');
+  el.className='win'; el.id='win-'+id;
+  var L=Math.min(100+Math.random()*120,window.innerWidth-w-20);
+  var T=Math.min(40+Math.random()*60,window.innerHeight-h-60);
+  el.style.cssText='width:'+w+'px;height:'+h+'px;top:'+T+'px;left:'+L+'px;z-index:'+(++zTop);
+  el.innerHTML='<div class="wbar" id="bar-'+id+'">'
+    +'<button class="wbtn wclose" onclick="closeWin(\''+id+'\')"></button>'
+    +'<button class="wbtn wmin"   onclick="minWin(\''+id+'\')"></button>'
+    +'<button class="wbtn wmax"   onclick="maxWin(\''+id+'\')"></button>'
+    +'<span class="wtitle">'+title+'</span></div>'
+    +'<div class="wbody" id="body-'+id+'">'+bodyHtml+'</div>';
+  document.getElementById('os').appendChild(el);
+  wins[id]={el:el,min:false,saved:null};
+  el.addEventListener('mousedown',function(){ focusWin(id); });
+  document.getElementById('bar-'+id).addEventListener('mousedown',function(ev){
+    if(ev.button!==0||wins[id].saved) return;
+    var osr=document.getElementById('os').getBoundingClientRect();
+    var ox=ev.clientX-el.offsetLeft, oy=ev.clientY-el.offsetTop;
+    function mv(e){
+      el.style.left=Math.max(0,Math.min(e.clientX-osr.left-ox,osr.width-el.offsetWidth))+'px';
+      el.style.top=Math.max(0,Math.min(e.clientY-osr.top-oy,osr.height-el.offsetHeight-48))+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',mv);
+    document.addEventListener('mouseup',up);
+    ev.preventDefault();
+  });
+  updateTB();
+}
+function focusWin(id){
+  if(!wins[id]) return;
+  wins[id].el.style.zIndex=++zTop;
+  document.querySelectorAll('.tb-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn=document.getElementById('tbb-'+id); if(btn) btn.classList.add('active');
+}
+function closeWin(id){
+  if(!wins[id]) return;
+  if(id==='music'&&musicPlaying){ musicPlaying=false; clearInterval(musicTimer); }
+  wins[id].el.remove(); delete wins[id]; updateTB();
+}
+function minWin(id){ if(!wins[id]) return; wins[id].min=true; wins[id].el.style.display='none'; updateTB(); }
+function unminWin(id){ if(!wins[id]) return; wins[id].min=false; wins[id].el.style.display='flex'; focusWin(id); }
+function maxWin(id){
+  if(!wins[id]) return;
+  var w=wins[id];
+  if(w.saved){ w.el.style.cssText=w.saved; w.el.style.borderRadius='14px'; w.saved=null; }
+  else{ w.saved=w.el.style.cssText; w.el.style.cssText='top:0;left:0;width:100%;height:calc(100vh - 48px);z-index:'+(++zTop)+';border-radius:0;display:flex;flex-direction:column;overflow:hidden;'; }
+}
+function updateTB(){
+  var bar=document.getElementById('tb-apps'); bar.innerHTML='';
+  Object.keys(wins).forEach(function(id){
+    var btn=document.createElement('button');
+    btn.className='tb-btn'+(wins[id].min?'':' active');
+    btn.id='tbb-'+id;
+    // Get title from window bar
+    var titleEl=document.querySelector('#win-'+id+' .wtitle');
+    btn.textContent=titleEl?titleEl.textContent:'App';
+    btn.onclick=function(){ if(wins[id].min) unminWin(id); else focusWin(id); };
+    bar.appendChild(btn);
+  });
+}
+
+// ══════════════ FILE EXPLORER ══════════════
+var feNavMap={
+  home:{label:'🏠 Inicio',   key:'home'},
+  pc:  {label:'🖥️ Este PC',  key:'home'},
+  docs:{label:'📄 Documentos',key:'docs'},
+  imgs:{label:'🖼️ Imágenes', key:'images'},
+  mus: {label:'🎵 Música',   key:'music'},
+  dl:  {label:'📥 Descargas',key:'downloads'},
+  sys: {label:'🔧 Sistema',  key:'system'},
+  trash:{label:'🗑️ Papelera',key:'trash'}
+};
+var fePathNames={home:'Inicio',pc:'Este PC',docs:'Documentos',imgs:'Imágenes',mus:'Música',dl:'Descargas',sys:'Sistema',trash:'Papelera'};
+
+function feNavigate(navId){
+  feSection=navId;
+  feSelected=null;
+  // update nav highlight
+  document.querySelectorAll('.fe-nav').forEach(function(n){ n.classList.remove('on'); });
+  var active=document.getElementById('fenv-'+navId);
+  if(active) active.classList.add('on');
+  // update path
+  var pathEl=document.getElementById('fe-path');
+  if(pathEl) pathEl.textContent='/home/usuario/'+fePathNames[navId];
+  // render files
+  feRender();
+}
+function feRender(){
+  var grid=document.getElementById('fe-grid');
+  if(!grid) return;
+  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
+  var items=FS[section]||[];
+  if(items.length===0){
+    grid.innerHTML='<div class="fe-empty">📭 Esta carpeta está vacía</div>';
+    return;
+  }
+  grid.innerHTML=items.map(function(f,i){
+    return '<div class="fe-item" id="fefi-'+i+'" onclick="feSelect('+i+')" ondblclick="feOpen('+i+')">'
+      +'<div class="fii">'+f.t+'</div>'
+      +'<div class="fin">'+f.n+'</div>'
+      +'</div>';
+  }).join('');
+}
+function feSelect(i){
+  feSelected=i;
+  document.querySelectorAll('.fe-item').forEach(function(el){ el.classList.remove('sel'); });
+  var el=document.getElementById('fefi-'+i); if(el) el.classList.add('sel');
+}
+function feOpen(i){
+  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
+  var items=FS[section]||[];
+  var f=items[i]; if(!f) return;
+  if(f.t==='📁'){
+    // try to navigate into subfolder
+    var found=Object.keys(feNavMap).find(function(k){ return feNavMap[k].label.indexOf(f.n)>=0; });
+    if(found) feNavigate(found);
+    else notify('📁','Carpeta','Abriendo: '+f.n);
+  } else {
+    notify(f.t,'Archivo',f.n+' abierto');
+  }
+}
+function feSaveToNotes(){
+  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
+  var items=FS[section]||[];
+  var lines='=== Contenido de '+fePathNames[feSection]+' ===\n\n';
+  items.forEach(function(f,i){ lines+=(i+1)+'. '+f.t+' '+f.n+'\n'; });
+  lines+='\n[Guardado desde Explorador de Archivos — NexosOS]';
+  // Open notes and inject
+  openApp('notes');
+  setTimeout(function(){
+    var ta=document.getElementById('note-ta');
+    if(ta){
+      ta.value=(ta.value?ta.value+'\n\n':'')+lines;
+      noteInput();
+      notify('💾','Guardado en Notas','Contenido de '+fePathNames[feSection]+' copiado');
+    }
+  },150);
+}
+
+// ══════════════ TERMINAL ══════════════
+function termKey(e){
+  var inp=document.getElementById('term-in'); if(!inp) return;
+  if(e.key==='Enter'){ var cmd=inp.value.trim(); inp.value=''; runCmd(cmd); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); histIdx=Math.min(histIdx+1,termHist.length-1); if(histIdx>=0) inp.value=termHist[histIdx]; }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); histIdx=Math.max(histIdx-1,-1); inp.value=histIdx>=0?termHist[histIdx]:''; }
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function runCmd(cmd){
+  if(cmd){ termHist.unshift(cmd); histIdx=-1; }
+  var out=document.getElementById('term-out'); if(!out) return;
+  function ln(txt,cls){ var d=document.createElement('div'); d.className='tl'+(cls?' '+cls:''); d.textContent=txt; out.appendChild(d); }
+  if(cmd){ var r=document.createElement('div'); r.className='tl'; r.innerHTML='<span class="tprompt">usuario@nexos:~$</span> <span class="tcmd">'+esc(cmd)+'</span>'; out.appendChild(r); }
+  var p=cmd.toLowerCase().trim().split(/\s+/);
+  var cmds={
+    '':function(){},
+    help:function(){ ln('Comandos disponibles:','tinfo'); [['ls','listar archivos'],['pwd','directorio'],['whoami','usuario'],['date','fecha/hora'],['uname','sistema'],['echo [txt]','imprimir'],['clear','limpiar'],['cal','calendario'],['ps','procesos'],['df','espacio'],['uptime','tiempo activo'],['mkdir [n]','crear carpeta'],['rm [n]','eliminar']].forEach(function(x){ ln('  '+x[0].padEnd(16)+x[1]); }); },
+    ls:function(){ ln('📁 documentos  📁 imágenes  📁 música  📁 videos'); ln('📄 notas.txt  📊 datos.xlsx  🖼️ foto.png  🎵 cancion.mp3'); },
+    pwd:function(){ ln('/home/usuario'); },
+    whoami:function(){ ln('usuario'); },
+    date:function(){ ln(new Date().toLocaleString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})); },
+    uname:function(){ ln('NexosOS 1.0.0 — x86_64 — NexosKernel 5.0'); },
+    echo:function(){ ln(cmd.length>5?cmd.substring(5):''); },
+    clear:function(){ out.innerHTML=''; return; },
+    ps:function(){ ln('PID    PROCESO            ESTADO'); [['1001','nexos-shell','ejecutando'],['1042','nexos-wm','ejecutando'],['1100','nexos-taskbar','ejecutando'],['1234','terminal','ejecutando']].forEach(function(r){ ln(r[0]+'   '+r[1].padEnd(19)+r[2]); }); },
+    df:function(){ ln('DISPOSITIVO   TAMAÑO  USADO  LIBRE  USO%'); ln('/dev/sda1     256 GB   42 GB  214 GB  16%'); ln('tmpfs           4 GB  0.2 GB  3.8 GB   5%'); },
+    uptime:function(){ ln('Activo: '+Math.floor(Math.random()*24)+'h '+Math.floor(Math.random()*60)+'m  |  Carga: 0.12, 0.08, 0.05'); },
+    cal:function(){ ln(new Date().toLocaleDateString('es-CO',{month:'long',year:'numeric'}).toUpperCase(),'tinfo'); ln('Lu  Ma  Mi  Ju  Vi  Sa  Do'); },
+    mkdir:function(){ ln(p[1]?'Carpeta "'+p[1]+'" creada.':'uso: mkdir <nombre>'); },
+    rm:function(){ ln(p[1]?'"'+p[1]+'" eliminado.':'uso: rm <archivo>'); }
+  };
+  var h=cmds[p[0]]; if(h) h(); else if(cmd) ln(p[0]+': no encontrado. Escribe "help"','terr');
+  var wrap=document.getElementById('term-wrap'); if(wrap) wrap.scrollTop=wrap.scrollHeight;
+}
+
+// ══════════════ NOTES ══════════════
+function noteInput(){
+  var ta=document.getElementById('note-ta');
+  var st=document.getElementById('note-st');
+  if(!ta||!st) return;
+  var txt=ta.value;
+  var w=txt.trim()===''?0:txt.trim().split(/\s+/).length;
+  st.textContent=w+' palabras · '+txt.length+' caracteres';
+}
+function noteSave(){ notify('💾','Guardado','Nota guardada correctamente.'); }
+function noteClear(){ var ta=document.getElementById('note-ta'); if(ta){ ta.value=''; noteInput(); } }
+function noteCopy(){
+  var ta=document.getElementById('note-ta'); if(!ta) return;
+  if(navigator.clipboard){ navigator.clipboard.writeText(ta.value).then(function(){ notify('📋','Copiado','Texto copiado.'); }); }
+  else notify('⚠️','Error','No se pudo copiar.');
+}
+
+// ══════════════ CALCULATOR ══════════════
+function cDisp(){ var el=document.getElementById('calc-cur'); if(!el) return; var v=C.cur; if(v!=='Error'&&v.length>13) v=parseFloat(v).toExponential(5); el.textContent=v; }
+function cHistSet(t){ var el=document.getElementById('calc-hist'); if(el) el.textContent=t||''; }
+function opLbl(op){ return{'+':'+','-':'−','*':'×','/':'÷'}[op]||op; }
+function cNum(n){ if(C.waitNext){ C.cur=n; C.waitNext=false; } else { if(C.cur==='Error') C.cur='0'; if(C.cur.replace('-','').replace('.','').length>=12) return; C.cur=(C.cur==='0')?n:C.cur+n; } cDisp(); }
+function cDot(){ if(C.waitNext){ C.cur='0.'; C.waitNext=false; cDisp(); return; } if(C.cur==='Error') C.cur='0'; if(C.cur.indexOf('.')===-1) C.cur+='.'; cDisp(); }
+function cOp(op){ if(C.cur==='Error'){ cAC(); return; } if(C.op!==null&&!C.waitNext) cCompute(false); C.prev=parseFloat(C.cur); C.op=op; C.waitNext=true; cHistSet(C.prev+' '+opLbl(op)); }
+function cCompute(showH){ if(C.op===null) return; var a=C.prev,b=parseFloat(C.cur),r; if(C.op==='+') r=a+b; else if(C.op==='-') r=a-b; else if(C.op==='*') r=a*b; else if(C.op==='/') r=b!==0?a/b:NaN; if(showH) cHistSet(a+' '+opLbl(C.op)+' '+b+' ='); if(isNaN(r)||!isFinite(r)) C.cur='Error'; else C.cur=String(parseFloat(r.toPrecision(12))); C.op=null; C.prev=null; C.waitNext=true; cDisp(); }
+function cEquals(){ if(C.op===null){ cHistSet(''); return; } cCompute(true); }
+function cAC(){ C={cur:'0',prev:null,op:null,waitNext:false}; cDisp(); cHistSet(''); }
+function cSign(){ if(C.cur==='0'||C.cur==='Error') return; C.cur=C.cur.charAt(0)==='-'?C.cur.slice(1):'-'+C.cur; cDisp(); }
+function cPct(){ if(C.cur==='Error') return; C.cur=String(parseFloat(C.cur)/100); cDisp(); }
+
+// ══════════════ MUSIC ══════════════
+function mSetUI(){ var s=songs[musicIdx]; var d=document.getElementById('mus-disc'),nm=document.getElementById('mus-name'),ar=document.getElementById('mus-art'); if(d) d.textContent=s.ico; if(nm) nm.textContent=s.title; if(ar) ar.textContent=s.artist; mFill(); mBtn(); }
+function mFill(){ var f=document.getElementById('mus-fill'); if(f) f.style.width=musicPct+'%'; }
+function mBtn(){ var btn=document.getElementById('mus-play'),d=document.getElementById('mus-disc'); if(btn) btn.textContent=musicPlaying?'⏸':'▶'; if(d) d.classList.toggle('spin',musicPlaying); }
+function mToggle(){ musicPlaying=!musicPlaying; mBtn(); if(musicPlaying){ musicTimer=setInterval(function(){ musicPct=Math.min(musicPct+0.4,100); mFill(); if(musicPct>=100) mNext(); },200); } else clearInterval(musicTimer); }
+function mPrev(){ musicIdx=(musicIdx-1+songs.length)%songs.length; musicPct=0; mSetUI(); }
+function mNext(){ musicIdx=(musicIdx+1)%songs.length; musicPct=0; mSetUI(); notify('🎵','Siguiente',songs[musicIdx].title+' — '+songs[musicIdx].artist); }
+
+// ══════════════ SETTINGS TABS ══════════════
+function setTab(btn,tabId){
+  var nav=btn.closest('.set-nav');
+  if(!nav) return;
+  nav.querySelectorAll('.sni').forEach(function(i){ i.classList.remove('on'); });
+  btn.classList.add('on');
+  ['s-display','s-sound','s-network','s-privacy','s-about'].forEach(function(id){
+    var t=document.getElementById(id); if(t) t.style.display=id===tabId?'block':'none';
+  });
+}
+
+// ══════════════ APP STORE (CUSTOM APPS) ══════════════
+function storeTab(btn, panel){
+  document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.querySelectorAll('.store-panel').forEach(function(p){ p.style.display='none'; });
+  var el=document.getElementById(panel); if(el) el.style.display='block';
+  if(panel==='sp-apps') storeRender();
+}
+function storeRender(){
+  var grid=document.getElementById('apps-grid');
+  if(!grid) return;
+  if(customApps.length===0){
+    grid.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">No hay apps instaladas aún.<br>Ve a "Agregar App" para crear una.</div>';
+    return;
+  }
+  grid.innerHTML=customApps.map(function(app){
+    return '<div class="app-card-wrap">'
+      +'<div class="app-card" ondblclick="openCustomApp(\''+app.id+'\')">'
+      +'<div class="aco">'+app.ico+'</div>'
+      +'<div class="acn">'+esc(app.name)+'</div>'
+      +'<div class="acd">Personalizada</div>'
+      +'</div>'
+      +'<button class="del-btn" onclick="deleteApp(\''+app.id+'\')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function deleteApp(id){
+  customApps=customApps.filter(function(a){ return a.id!==id; });
+  storeRender();
+  smRefreshCustom();
+  // also add desktop icon update
+  renderCustomDesktopIcons();
+  notify('🗑️','App eliminada','La app fue removida del sistema.');
+}
+function addApp(){
+  var name=document.getElementById('app-name').value.trim();
+  var ico=document.getElementById('app-ico').value.trim()||'🔵';
+  var html=document.getElementById('app-html').value.trim();
+  if(!name){ notify('⚠️','Error','Ingresa un nombre para la app.'); return; }
+  if(!html){ notify('⚠️','Error','Ingresa el código HTML de la app.'); return; }
+  var id='app_'+Date.now();
+  customApps.push({id:id, name:name, ico:ico, html:html});
+  storeRender();
+  smRefreshCustom();
+  renderCustomDesktopIcons();
+  // clear form
+  document.getElementById('app-name').value='';
+  document.getElementById('app-html').value='';
+  document.getElementById('app-ico').value='';
+  notify('🚀','App instalada','"'+name+'" está lista. Doble clic para abrirla.');
+  // switch to apps tab
+  var tabBtn=document.getElementById('tab-apps');
+  if(tabBtn) storeTab(tabBtn,'sp-apps');
+}
+
+// Render custom app icons on desktop
+function renderCustomDesktopIcons(){
+  // remove old custom icons
+  document.querySelectorAll('.dico-custom').forEach(function(el){ el.remove(); });
+  var os=document.getElementById('os');
+  customApps.forEach(function(app, i){
+    var d=document.createElement('div');
+    d.className='dico dico-custom';
+    // place them on right side
+    var top=18+(i*88);
+    d.style.cssText='top:'+(top+100)+'px;right:16px;';
+    d.innerHTML='<div class="di">'+app.ico+'</div><div class="dl">'+esc(app.name)+'</div>';
+    d.ondblclick=(function(id){ return function(){ openCustomApp(id); }; })(app.id);
+    os.appendChild(d);
+  });
+}
+
+// ══════════════ SHUTDOWN ══════════════
+function doShutdown(){
+  smClose();
+  var sd=document.getElementById('shutdown'); sd.classList.add('show');
+  setTimeout(function(){
+    document.getElementById('sd-txt').innerHTML='NexosOS apagado &nbsp;<button onclick="location.reload()" style="margin-top:12px;padding:8px 22px;background:rgba(99,102,241,.85);border:none;border-radius:8px;color:#fff;font-size:13px;cursor:pointer;display:block;">Reiniciar</button>';
+  },2200);
+}
+
+// ══════════════ APP DEFINITIONS ══════════════
+var APPS={
+
+  files:{
+    title:'📁 Explorador de Archivos', w:660, h:420,
+    html:function(){
+      feSection='home'; feSelected=null;
+      var navs=[
+        {id:'home',  label:'🏠 Inicio',    on:true},
+        {id:'pc',    label:'🖥️ Este PC',   on:false},
+        {id:'docs',  label:'📄 Documentos',on:false},
+        {id:'imgs',  label:'🖼️ Imágenes',  on:false},
+        {id:'mus',   label:'🎵 Música',    on:false},
+        {id:'dl',    label:'📥 Descargas', on:false},
+        {id:'sys',   label:'🔧 Sistema',   on:false},
+        {id:'trash', label:'🗑️ Papelera',  on:false}
+      ];
+      var sideHtml=navs.map(function(n){
+        return '<div class="fe-nav'+(n.on?' on':'')+'" id="fenv-'+n.id+'" onclick="feNavigate(\''+n.id+'\')">'+(n.label)+'</div>';
+      }).join('');
+      var fileItems=FS.home.map(function(f,i){
+        return '<div class="fe-item" id="fefi-'+i+'" onclick="feSelect('+i+')" ondblclick="feOpen('+i+')">'
+          +'<div class="fii">'+f.t+'</div><div class="fin">'+f.n+'</div></div>';
+      }).join('');
+      return '<div class="fe-wrap">'
+        +'<div class="fe-side">'+sideHtml+'</div>'
+        +'<div class="fe-main">'
+        +'<div class="fe-toolbar">'
+        +'<span class="fe-path" id="fe-path">/home/usuario/Inicio</span>'
+        +'<button class="fe-savebtn" onclick="feSaveToNotes()">💾 Guardar en Notas</button>'
+        +'</div>'
+        +'<div class="fe-grid" id="fe-grid">'+fileItems+'</div>'
+        +'</div></div>';
+    },
+    ready:function(){}
+  },
+
+  terminal:{
+    title:'💻 Terminal', w:560, h:360,
+    html:function(){
+      return '<div id="term-wrap"><div class="tl tinfo">NexosOS Terminal v1.0 &mdash; escribe "help" para ver comandos</div><div class="tl">&nbsp;</div><div id="term-out"></div><div id="term-row"><span class="tprompt">usuario@nexos:~$&nbsp;</span><input id="term-in" type="text" autocomplete="off" spellcheck="false" onkeydown="termKey(event)" placeholder="escribe un comando..."></div></div>';
+    },
+    ready:function(){ var i=document.getElementById('term-in'); if(i) i.focus(); }
+  },
+
+  notes:{
+    title:'📝 Editor de Notas', w:480, h:380,
+    html:function(){
+      return '<div class="note-wrap"><div class="note-bar"><button onclick="noteSave()">💾 Guardar</button><button onclick="noteClear()">🗑️ Limpiar</button><button onclick="noteCopy()">📋 Copiar</button></div><textarea id="note-ta" placeholder="Empieza a escribir aquí..." oninput="noteInput()"></textarea><div id="note-st">0 palabras · 0 caracteres</div></div>';
+    }
+  },
+
+  calc:{
+    title:'🧮 Calculadora', w:300, h:440,
+    html:function(){
+      var rows=[
+        [{l:'AC',cls:'cb-ac',fn:"cAC()"},{l:'±',cls:'cb-sp',fn:"cSign()"},{l:'%',cls:'cb-sp',fn:"cPct()"},{l:'÷',cls:'cb-op',fn:"cOp('/')"}],
+        [{l:'7',cls:'cb-num',fn:"cNum('7')"},{l:'8',cls:'cb-num',fn:"cNum('8')"},{l:'9',cls:'cb-num',fn:"cNum('9')"},{l:'×',cls:'cb-op',fn:"cOp('*')"}],
+        [{l:'4',cls:'cb-num',fn:"cNum('4')"},{l:'5',cls:'cb-num',fn:"cNum('5')"},{l:'6',cls:'cb-num',fn:"cNum('6')"},{l:'−',cls:'cb-op',fn:"cOp('-')"}],
+        [{l:'1',cls:'cb-num',fn:"cNum('1')"},{l:'2',cls:'cb-num',fn:"cNum('2')"},{l:'3',cls:'cb-num',fn:"cNum('3')"},{l:'+',cls:'cb-op',fn:"cOp('+')"}],
+        [{l:'0',cls:'cb-num cb-zero',fn:"cNum('0')"},{l:'.',cls:'cb-num',fn:"cDot()"},{l:'=',cls:'cb-eq',fn:"cEquals()"}]
+      ];
+      var g=rows.map(function(row){ return row.map(function(b){ return '<button class="cb '+b.cls+'" onclick="'+b.fn+'">'+b.l+'</button>'; }).join(''); }).join('');
+      return '<div class="calc-wrap"><div class="calc-disp"><div class="calc-hist" id="calc-hist"></div><div class="calc-cur" id="calc-cur">0</div></div><div class="calc-grid">'+g+'</div></div>';
+    },
+    ready:function(){ C={cur:'0',prev:null,op:null,waitNext:false}; }
+  },
+
+  music:{
+    title:'🎵 Reproductor de Música', w:320, h:340,
+    html:function(){
+      return '<div class="music-wrap"><div class="mdisc" id="mus-disc">🎶</div><div style="text-align:center"><div class="mname" id="mus-name">Noche Digital</div><div class="mart" id="mus-art">NexosOS Radio</div></div><div class="mprog"><div class="mfill" id="mus-fill"></div></div><div class="mctrl"><button class="mc" onclick="mPrev()">⏮</button><button class="mc mcplay" id="mus-play" onclick="mToggle()">▶</button><button class="mc" onclick="mNext()">⏭</button></div></div>';
+    },
+    ready:function(){ mSetUI(); }
+  },
+
+  settings:{
+    title:'⚙️ Ajustes del Sistema', w:540, h:430,
+    html:function(){
+      function tog(on){ return '<div class="tog'+(on?' on':'')+'" onclick="this.classList.toggle(\'on\')"><div class="tth"></div></div>'; }
+      function row(l,on){ return '<div class="set-row"><span class="set-rl">'+l+'</span>'+tog(on)+'</div>'; }
+      function kv(k,v){ return '<div class="set-row"><span class="set-rl">'+k+'</span><span style="font-size:12px;color:rgba(255,255,255,.45)">'+v+'</span></div>'; }
+      return '<div class="set-wrap"><div class="set-nav">'
+        +'<div class="sni on"  onclick="setTab(this,\'s-display\')">🖥️ Pantalla</div>'
+        +'<div class="sni"     onclick="setTab(this,\'s-sound\')">🔊 Sonido</div>'
+        +'<div class="sni"     onclick="setTab(this,\'s-network\')">🌐 Red</div>'
+        +'<div class="sni"     onclick="setTab(this,\'s-privacy\')">🔒 Privacidad</div>'
+        +'<div class="sni"     onclick="setTab(this,\'s-about\')">ℹ️ Acerca de</div>'
+        +'<div style="flex:1"></div>'
+        +'<div class="sni" style="background:rgba(99,102,241,.18);color:#a5b4fc;margin-top:8px;" onclick="openApp(\'store\')">🚀 Apps Lanzadas</div>'
+        +'</div>'
+        +'<div class="set-body">'
+        +'<div id="s-display"><div class="set-title">Pantalla</div><div class="set-sec"><div class="set-lbl">Apariencia</div>'+row('Modo oscuro',true)+row('Transparencia',true)+row('Animaciones',true)+row('Fuente grande',false)+'</div><div class="set-sec"><div class="set-lbl">Brillo</div><div class="set-row"><input type="range" class="sslider" min="10" max="100" value="80"></div></div></div>'
+        +'<div id="s-sound" style="display:none"><div class="set-title">Sonido</div><div class="set-sec"><div class="set-lbl">Volumen</div><div class="set-row"><input type="range" class="sslider" min="0" max="100" value="70"></div>'+row('Sonidos del sistema',true)+row('Notificaciones',true)+'</div></div>'
+        +'<div id="s-network" style="display:none"><div class="set-title">Red</div><div class="set-sec">'+row('Wi-Fi',true)+row('Bluetooth',false)+row('VPN',false)+row('Modo avión',false)+'</div></div>'
+        +'<div id="s-privacy" style="display:none"><div class="set-title">Privacidad</div><div class="set-sec">'+row('Historial',false)+row('Diagnósticos',true)+row('Telemetría',false)+'</div></div>'
+        +'<div id="s-about" style="display:none"><div class="set-title">Acerca de NexosOS</div><div class="set-sec">'+kv('Sistema','NexosOS')+kv('Versión','1.0.0 (Build 2026)')+kv('Procesador','Nexos x86-64')+kv('RAM','8 GB')+kv('Almacenamiento','256 GB SSD')+kv('Kernel','NexosKernel 5.0')+'</div></div>'
+        +'</div></div>';
+    }
+  },
+
+  store:{
+    title:'🚀 Apps Lanzadas', w:640, h:460,
+    html:function(){
+      return '<div class="store-wrap">'
+        +'<div class="store-tabs">'
+        +'<button class="stab on" id="tab-apps"   onclick="storeTab(this,\'sp-apps\')">📱 Apps instaladas</button>'
+        +'<button class="stab"    id="tab-add"    onclick="storeTab(this,\'sp-add\')">➕ Agregar App</button>'
+        +'</div>'
+        // Panel apps
+        +'<div class="store-panel" id="sp-apps">'
+        +'<div id="apps-grid" class="app-grid"></div>'
+        +'</div>'
+        // Panel agregar
+        +'<div class="store-panel" id="sp-add" style="display:none">'
+        +'<div class="add-form">'
+        +'<div><label>Nombre de la app</label><input id="app-name" type="text" placeholder="Mi App Genial" maxlength="30"></div>'
+        +'<div><label>Emoji / Logo (un emoji)</label><input id="app-ico" type="text" placeholder="🔵" maxlength="4" style="width:80px;font-size:20px;text-align:center;"></div>'
+        +'<div><label>Código HTML de la app</label><textarea id="app-html" placeholder="&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;body style=&quot;background:#1a1a2e;color:#fff;padding:20px;font-family:sans-serif;&quot;&gt;\n  &lt;h1&gt;Mi App&lt;/h1&gt;\n  &lt;p&gt;Contenido aquí...&lt;/p&gt;\n&lt;/body&gt;\n&lt;/html&gt;"></textarea></div>'
+        +'<button class="add-btn" onclick="addApp()">🚀 Instalar App</button>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:4px;">La app aparecerá en el escritorio y en el menú inicio</div>'
+        +'</div></div>'
+        +'</div>';
+    },
+    ready:function(){ storeRender(); }
+  }
+};
+
+// ══════════════ BOOT ══════════════
+setTimeout(function(){ notify('✅','NexosOS listo','Doble clic en los íconos para abrir apps.'); },700);
+</script>
+</body>
+</html>
