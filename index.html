@@ -7,9 +7,38 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
-#os{width:100vw;height:100vh;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);position:relative;overflow:hidden;}
 
-/* ── Taskbar ── */
+/* ══ LOGIN SCREEN ══ */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:flex;align-items:center;justify-content:center;z-index:99999;flex-direction:column;gap:0;}
+#login-screen.hidden{display:none;}
+.login-box{background:rgba(18,18,42,0.95);border:0.5px solid rgba(255,255,255,0.12);border-radius:20px;padding:36px 40px;width:360px;box-shadow:0 32px 80px rgba(0,0,0,0.8);display:flex;flex-direction:column;gap:14px;}
+.login-logo{text-align:center;font-size:52px;margin-bottom:4px;}
+.login-title{text-align:center;font-size:22px;color:#fff;font-weight:600;margin-bottom:2px;}
+.login-sub{text-align:center;font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:8px;}
+.login-label{font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.login-inp{width:100%;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s;}
+.login-inp:focus{border-color:rgba(129,140,248,0.6);}
+.login-inp::placeholder{color:rgba(255,255,255,0.25);}
+.login-save-notice{background:rgba(99,102,241,0.12);border:0.5px solid rgba(99,102,241,0.3);border-radius:8px;padding:10px 12px;font-size:11px;color:#a5b4fc;line-height:1.5;display:none;}
+.login-save-notice.show{display:block;}
+.login-btn{width:100%;padding:12px;border:none;border-radius:10px;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px;}
+.login-btn:hover{background:#4f46e5;}
+.login-btn:disabled{background:rgba(99,102,241,0.4);cursor:not-allowed;}
+.login-save-btn{width:100%;padding:11px;border:none;border-radius:10px;background:rgba(34,197,94,0.2);border:0.5px solid rgba(34,197,94,0.4);color:#86efac;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;}
+.login-save-btn:hover{background:rgba(34,197,94,0.3);}
+.login-err{font-size:12px;color:#fca5a5;text-align:center;display:none;}
+.login-err.show{display:block;}
+.login-users{display:flex;flex-direction:column;gap:6px;}
+.login-user-chip{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.05);border-radius:8px;cursor:pointer;transition:background .1s;}
+.login-user-chip:hover{background:rgba(255,255,255,0.1);}
+.login-user-chip .luc-ava{width:32px;height:32px;border-radius:50%;background:rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#c7d2fe;flex-shrink:0;}
+.login-user-chip .luc-name{font-size:13px;color:#fff;}
+
+/* ══ OS ══ */
+#os{width:100vw;height:100vh;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);position:relative;overflow:hidden;display:none;}
+#os.show{display:block;}
+
+/* Taskbar */
 #taskbar{position:absolute;bottom:0;left:0;right:0;height:48px;background:rgba(10,10,25,0.95);border-top:0.5px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 10px;gap:6px;z-index:1000;}
 #start-btn{width:40px;height:40px;border-radius:10px;border:none;background:rgba(99,102,241,0.85);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 #start-btn:hover{background:rgb(99,102,241);}
@@ -20,36 +49,38 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
 .tb-btn.active{background:rgba(99,102,241,0.38);border-bottom:2px solid #818cf8;}
 #tb-clock{margin-left:auto;color:rgba(255,255,255,0.85);font-size:12px;text-align:right;padding-right:6px;line-height:1.5;flex-shrink:0;}
 #tb-date{font-size:10px;color:rgba(255,255,255,0.4);}
+#tb-user{font-size:11px;color:rgba(255,255,255,0.5);padding:0 10px;cursor:pointer;display:flex;align-items:center;gap:6px;border-left:0.5px solid rgba(255,255,255,0.08);height:100%;}
+#tb-user:hover{color:#fff;}
 
-/* ── Desktop icons ── */
+/* Desktop icons */
 .dico{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px;border-radius:10px;width:76px;transition:background .12s;}
 .dico:hover{background:rgba(255,255,255,0.11);}
 .dico .di{font-size:34px;line-height:1;}
 .dico .dl{font-size:11px;color:#fff;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.9);line-height:1.3;}
 
-/* ── Start menu ── */
-#smenu{position:absolute;bottom:54px;left:10px;width:310px;background:rgba(18,18,38,0.98);border-radius:14px;border:0.5px solid rgba(255,255,255,0.1);z-index:2000;padding:14px;display:none;flex-direction:column;gap:4px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+/* Start menu */
+#smenu{position:absolute;bottom:54px;left:10px;width:310px;background:rgba(18,18,38,0.98);border-radius:14px;border:0.5px solid rgba(255,255,255,0.1);z-index:2000;padding:14px;display:none;flex-direction:column;gap:4px;box-shadow:0 20px 60px rgba(0,0,0,.7);max-height:calc(100vh - 80px);overflow-y:auto;}
 #smenu.open{display:flex;}
 #sm-q{width:100%;padding:9px 14px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:9px;color:#fff;font-size:13px;outline:none;}
 #sm-q::placeholder{color:rgba(255,255,255,.3);}
 .smsec{font-size:10px;color:rgba(255,255,255,.3);margin:8px 0 2px;text-transform:uppercase;letter-spacing:.1em;}
 .smit{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .12s;}
 .smit:hover{background:rgba(255,255,255,.09);}
-.smit .sico{font-size:20px;}
+.smit .sico{font-size:20px;width:24px;text-align:center;flex-shrink:0;}
 .smit .snm{color:#fff;font-size:13px;}
 .smfoot{border-top:0.5px solid rgba(255,255,255,.08);margin-top:6px;padding-top:10px;display:flex;gap:6px;}
 .smfoot .smit{flex:1;justify-content:center;}
 
-/* ── Windows ── */
+/* Windows */
 .win{position:absolute;background:#1a1a2e;border-radius:14px;border:0.5px solid rgba(255,255,255,.1);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.7);display:flex;flex-direction:column;}
 .wbar{height:38px;background:rgba(255,255,255,.04);display:flex;align-items:center;padding:0 14px;gap:8px;cursor:grab;border-bottom:0.5px solid rgba(255,255,255,.06);flex-shrink:0;user-select:none;}
 .wbar:active{cursor:grabbing;}
 .wbtn{width:13px;height:13px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;}
 .wclose{background:#ff5f57;}.wmin{background:#ffbd2e;}.wmax{background:#28c840;}
-.wtitle{color:rgba(255,255,255,.65);font-size:12px;font-weight:500;margin-left:4px;}
+.wtitle{color:rgba(255,255,255,.65);font-size:12px;font-weight:500;margin-left:4px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wbody{flex:1;overflow:auto;}
 
-/* ── File Explorer ── */
+/* File Explorer */
 .fe-wrap{display:flex;height:100%;}
 .fe-side{width:155px;background:rgba(0,0,0,.22);padding:10px 8px;border-right:0.5px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;flex-direction:column;gap:2px;}
 .fe-nav{padding:7px 10px;border-radius:7px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .1s;}
@@ -58,32 +89,34 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
 .fe-main{flex:1;display:flex;flex-direction:column;min-width:0;}
 .fe-toolbar{padding:8px 12px;background:rgba(0,0,0,.15);border-bottom:0.5px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .fe-path{font-size:11px;color:rgba(255,255,255,.4);flex:1;}
-.fe-savebtn{background:rgba(99,102,241,.3);border:0.5px solid rgba(129,140,248,.4);color:#c7d2fe;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;white-space:nowrap;}
-.fe-savebtn:hover{background:rgba(99,102,241,.5);}
 .fe-grid{flex:1;padding:14px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;overflow-y:auto;}
-.fe-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 8px;border-radius:9px;width:76px;transition:background .1s;}
+.fe-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 8px;border-radius:9px;width:80px;transition:background .1s;}
 .fe-item:hover{background:rgba(255,255,255,.09);}
-.fe-item .fii{font-size:28px;line-height:1;}
-.fe-item .fin{font-size:10px;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;word-break:break-word;}
 .fe-item.sel{background:rgba(99,102,241,.25);}
-.fe-empty{color:rgba(255,255,255,.25);font-size:13px;padding:20px;text-align:center;width:100%;}
+.fe-item .fii{font-size:26px;line-height:1;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:8px;overflow:hidden;}
+.fe-item .fii img{width:100%;height:100%;object-fit:cover;}
+.fe-item .fin{font-size:10px;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;word-break:break-word;max-width:76px;}
+.fe-empty{color:rgba(255,255,255,.25);font-size:13px;padding:20px;text-align:center;width:100%;line-height:1.8;}
+.fe-tbtn{padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;border:0.5px solid;}
+.fe-tbtn-del{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.3);color:#fca5a5;}
+.fe-tbtn-open{background:rgba(99,102,241,.3);border-color:rgba(129,140,248,.4);color:#c7d2fe;}
 
-/* ── Terminal ── */
+/* Terminal */
 #term-wrap{background:#0a0a0a;padding:14px;font-family:'Courier New',monospace;font-size:13px;color:#00ff88;height:100%;overflow-y:auto;display:flex;flex-direction:column;}
 .tl{margin-bottom:3px;word-break:break-word;line-height:1.5;}
 .tprompt{color:#818cf8;}.tcmd{color:rgba(255,255,255,.6);}.terr{color:#fca5a5;}.tinfo{color:#a5b4fc;}
 #term-row{display:flex;align-items:center;gap:6px;margin-top:4px;flex-shrink:0;}
 #term-in{background:transparent;border:none;outline:none;color:#00ff88;font-family:inherit;font-size:13px;flex:1;caret-color:#00ff88;}
 
-/* ── Notes ── */
+/* Notes */
 .note-wrap{height:100%;display:flex;flex-direction:column;}
-.note-bar{background:rgba(0,0,0,.25);padding:7px 12px;display:flex;gap:8px;border-bottom:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
+.note-bar{background:rgba(0,0,0,.25);padding:7px 12px;display:flex;gap:8px;border-bottom:0.5px solid rgba(255,255,255,.06);flex-shrink:0;flex-wrap:wrap;}
 .note-bar button{background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.85);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;}
 .note-bar button:hover{background:rgba(255,255,255,.14);}
 #note-ta{flex:1;background:#111122;color:rgba(255,255,255,.88);border:none;outline:none;padding:18px;font-size:14px;resize:none;line-height:1.8;font-family:inherit;}
 #note-st{background:rgba(0,0,0,.2);padding:4px 14px;font-size:10px;color:rgba(255,255,255,.3);border-top:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
 
-/* ── Calculator ── */
+/* Calculator */
 .calc-wrap{height:100%;background:#111122;display:flex;flex-direction:column;padding:16px;gap:12px;}
 .calc-disp{background:rgba(0,0,0,.5);border-radius:12px;padding:16px 18px;text-align:right;flex-shrink:0;}
 .calc-hist{font-size:13px;color:rgba(255,255,255,.38);min-height:20px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -98,9 +131,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
 .cb-sp{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);}
 .cb-zero{grid-column:span 2;}
 
-/* ── Settings ── */
+/* Settings */
 .set-wrap{display:flex;height:100%;}
-.set-nav{width:165px;background:rgba(0,0,0,.22);padding:10px 8px;border-right:0.5px solid rgba(255,255,255,.06);flex-shrink:0;}
+.set-nav{width:165px;background:rgba(0,0,0,.22);padding:10px 8px;border-right:0.5px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;flex-direction:column;}
 .sni{padding:9px 12px;border-radius:8px;font-size:12px;color:rgba(255,255,255,.65);cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .1s;}
 .sni:hover{background:rgba(255,255,255,.07);color:#fff;}
 .sni.on{background:rgba(99,102,241,.22);color:#a5b4fc;}
@@ -112,176 +145,372 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
 .set-rl{font-size:13px;color:rgba(255,255,255,.82);}
 .tog{width:40px;height:22px;background:rgba(255,255,255,.15);border-radius:11px;position:relative;cursor:pointer;transition:background .22s;flex-shrink:0;}
 .tog.on{background:#6366f1;}
-.tth{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .22s;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.tth{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .22s;}
 .tog.on .tth{left:21px;}
 .sslider{width:100%;accent-color:#6366f1;}
 
-/* ── Music ── */
-.music-wrap{height:100%;background:linear-gradient(160deg,#1e1b4b,#111827);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;}
-.mdisc{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:38px;}
+/* Music Player */
+.music-wrap{height:100%;background:linear-gradient(160deg,#1e1b4b,#111827);display:flex;flex-direction:column;}
+.music-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;}
+.mdisc{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;}
 .mdisc.spin{animation:dspin 6s linear infinite;}
 @keyframes dspin{to{transform:rotate(360deg);}}
-.mname{color:#fff;font-size:15px;font-weight:500;text-align:center;}
+.mname{color:#fff;font-size:15px;font-weight:500;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mart{color:rgba(255,255,255,.45);font-size:12px;text-align:center;}
-.mprog{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
-.mfill{height:100%;background:#6366f1;border-radius:2px;transition:width .3s linear;width:0%;}
+.mprog-wrap{width:100%;display:flex;align-items:center;gap:8px;}
+.mprog{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;cursor:pointer;}
+.mfill{height:100%;background:#6366f1;border-radius:2px;width:0%;}
+.mtime{font-size:10px;color:rgba(255,255,255,.35);white-space:nowrap;}
 .mctrl{display:flex;gap:16px;align-items:center;}
 .mc{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;transition:color .1s,transform .1s;line-height:1;}
 .mc:hover{color:#fff;transform:scale(1.1);}
 .mcplay{background:#6366f1;border-radius:50%;width:46px;height:46px;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff!important;}
+.music-bottom{border-top:0.5px solid rgba(255,255,255,.07);padding:10px 14px;flex-shrink:0;}
+.music-playlist{max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;margin-top:8px;}
+.mpl-item{padding:7px 10px;border-radius:7px;font-size:12px;color:rgba(255,255,255,.65);cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s;}
+.mpl-item:hover{background:rgba(255,255,255,.07);}
+.mpl-item.active{background:rgba(99,102,241,.25);color:#c7d2fe;}
+.mpl-item .mpi-ico{font-size:14px;flex-shrink:0;}
+.mpl-item .mpi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.music-add-btn{background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;width:100%;}
+.music-add-btn:hover{background:rgba(255,255,255,.12);}
 
-/* ── App Store / Lanzadas ── */
+/* Wikipedia */
+.wiki-wrap{height:100%;display:flex;flex-direction:column;background:#111122;}
+.wiki-bar{padding:10px 14px;background:rgba(0,0,0,.3);border-bottom:0.5px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0;align-items:center;}
+.wiki-logo-img{height:26px;border-radius:4px;opacity:.85;}
+#wiki-q{flex:1;background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-size:14px;padding:8px 12px;outline:none;}
+#wiki-q:focus{border-color:rgba(129,140,248,.6);}
+#wiki-q::placeholder{color:rgba(255,255,255,.3);}
+.wiki-btn{background:#6366f1;border:none;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;}
+.wiki-btn:hover{background:#4f46e5;}
+.wiki-lang-btn{background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;}
+.wiki-lang-btn.on{background:rgba(99,102,241,.3);color:#c7d2fe;border-color:rgba(129,140,248,.4);}
+.wiki-result{flex:1;overflow-y:auto;padding:20px 24px;}
+#wiki-content{color:rgba(255,255,255,.85);line-height:1.8;font-size:14px;}
+#wiki-content h1{font-size:24px;color:#fff;margin-bottom:14px;font-weight:600;border-bottom:0.5px solid rgba(255,255,255,.1);padding-bottom:10px;}
+#wiki-content h2{font-size:17px;color:#c7d2fe;margin:22px 0 8px;font-weight:500;border-bottom:0.5px solid rgba(255,255,255,.06);padding-bottom:6px;}
+#wiki-content h3{font-size:14px;color:#a5b4fc;margin:14px 0 6px;font-weight:500;}
+#wiki-content h4{font-size:13px;color:#818cf8;margin:10px 0 4px;font-weight:500;}
+#wiki-content p{margin-bottom:12px;color:rgba(255,255,255,.8);}
+#wiki-content a.wlink{color:#818cf8;text-decoration:none;cursor:pointer;}
+#wiki-content a.wlink:hover{text-decoration:underline;}
+#wiki-content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;}
+#wiki-content th{background:rgba(99,102,241,.2);color:#c7d2fe;padding:7px 10px;text-align:left;border:0.5px solid rgba(255,255,255,.1);}
+#wiki-content td{padding:7px 10px;border:0.5px solid rgba(255,255,255,.07);color:rgba(255,255,255,.7);}
+#wiki-content ul,#wiki-content ol{margin:8px 0 12px 22px;color:rgba(255,255,255,.75);}
+#wiki-content li{margin-bottom:5px;}
+#wiki-content img{max-width:200px;border-radius:6px;margin:8px 0 8px 16px;float:right;opacity:.85;}
+#wiki-content .infobox{float:right;margin:0 0 14px 16px;max-width:260px;font-size:12px;}
+#wiki-content blockquote{border-left:3px solid #6366f1;padding:8px 14px;margin:12px 0;color:rgba(255,255,255,.6);font-style:italic;}
+.wiki-loading{display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:12px;color:rgba(255,255,255,.4);}
+.wiki-spinner{width:36px;height:36px;border:3px solid rgba(129,140,248,.2);border-top-color:#818cf8;border-radius:50%;animation:wsp .8s linear infinite;}
+@keyframes wsp{to{transform:rotate(360deg);}}
+.wiki-home{text-align:center;padding:20px 0;}
+.wiki-big{font-size:60px;margin-bottom:12px;}
+.wiki-home h2{color:#fff;font-size:18px;margin-bottom:8px;}
+.wiki-home p{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:16px;}
+.wiki-sugs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.wiki-sug{background:rgba(99,102,241,.18);border:0.5px solid rgba(129,140,248,.3);color:#c7d2fe;padding:7px 16px;border-radius:20px;cursor:pointer;font-size:12px;}
+.wiki-sug:hover{background:rgba(99,102,241,.35);}
+
+/* App Store */
 .store-wrap{height:100%;display:flex;flex-direction:column;}
-.store-tabs{display:flex;gap:0;border-bottom:0.5px solid rgba(255,255,255,.08);flex-shrink:0;}
-.stab{flex:1;padding:10px;background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;transition:color .15s,border-bottom .15s;border-bottom:2px solid transparent;}
-.stab:hover{color:#fff;}
+.store-tabs{display:flex;border-bottom:0.5px solid rgba(255,255,255,.08);flex-shrink:0;}
+.stab{flex:1;padding:10px;background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;border-bottom:2px solid transparent;}
 .stab.on{color:#818cf8;border-bottom:2px solid #818cf8;}
 .store-panel{flex:1;overflow-y:auto;padding:16px;}
-/* App grid */
 .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:14px;}
-.app-card{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.07);cursor:pointer;transition:background .1s,border-color .1s;}
-.app-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.15);}
-.app-card .aco{font-size:32px;line-height:1;}
-.app-card .acn{font-size:11px;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;word-break:break-word;}
-.app-card .acd{font-size:9px;color:rgba(99,102,241,.8);margin-top:2px;}
-/* Add app form */
-.add-form{background:rgba(0,0,0,.2);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;}
-.add-form label{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:2px;display:block;text-transform:uppercase;letter-spacing:.06em;}
-.add-form input,.add-form textarea,.add-form select{width:100%;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;font-family:inherit;}
-.add-form textarea{resize:vertical;min-height:80px;font-family:'Courier New',monospace;font-size:12px;}
-.add-form input:focus,.add-form textarea:focus{border-color:rgba(129,140,248,.5);}
-.add-btn{background:#6366f1;border:none;color:#fff;padding:10px 0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;transition:background .15s;width:100%;}
-.add-btn:hover{background:#4f46e5;}
-.del-btn{background:rgba(239,68,68,.2);border:0.5px solid rgba(239,68,68,.3);color:#fca5a5;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:10px;}
-.del-btn:hover{background:rgba(239,68,68,.35);}
 .app-card-wrap{position:relative;}
-.app-card-wrap .del-btn{position:absolute;top:4px;right:4px;padding:2px 7px;}
-/* custom iframe app */
+.app-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.07);cursor:pointer;transition:background .1s;}
+.app-card:hover{background:rgba(255,255,255,.09);}
+.app-card .aco{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;background:rgba(255,255,255,.06);}
+.app-card .aco img{width:100%;height:100%;object-fit:cover;}
+.app-card .acn{font-size:11px;color:rgba(255,255,255,.8);text-align:center;word-break:break-word;}
+.app-card-wrap .acwdel{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.2);border:0.5px solid rgba(239,68,68,.3);color:#fca5a5;padding:2px 7px;border-radius:6px;cursor:pointer;font-size:10px;}
+.add-form{background:rgba(0,0,0,.2);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;}
+.add-form label{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px;display:block;text-transform:uppercase;letter-spacing:.06em;}
+.add-form input,.add-form textarea{width:100%;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;font-family:inherit;}
+.add-form input:focus,.add-form textarea:focus{border-color:rgba(129,140,248,.5);}
+.add-form textarea{resize:vertical;min-height:110px;font-family:'Courier New',monospace;font-size:12px;}
+.add-btn{background:#6366f1;border:none;color:#fff;padding:11px 0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;width:100%;}
+.add-btn:hover{background:#4f46e5;}
+.img-upload-area{border:1.5px dashed rgba(255,255,255,.2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:border-color .15s;background:rgba(255,255,255,.03);}
+.img-upload-area:hover{border-color:rgba(129,140,248,.5);}
+.img-preview{width:64px;height:64px;border-radius:10px;object-fit:cover;margin:0 auto 6px;display:block;}
+.img-upload-txt{font-size:12px;color:rgba(255,255,255,.4);}
 .iframe-wrap{height:100%;display:flex;flex-direction:column;}
 .iframe-wrap iframe{flex:1;border:none;background:#fff;}
 
-/* ── Notification ── */
-#notif{position:fixed;top:14px;right:14px;z-index:9999;background:rgba(18,18,42,.98);border:0.5px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;max-width:260px;transform:translateX(290px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+/* Save dialog */
+.dlg-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9500;display:flex;align-items:center;justify-content:center;}
+.dlg-box{background:#1e1e35;border:0.5px solid rgba(255,255,255,.15);border-radius:14px;padding:26px;width:340px;box-shadow:0 24px 60px rgba(0,0,0,.8);display:flex;flex-direction:column;gap:14px;}
+.dlg-title{font-size:16px;color:#fff;font-weight:500;}
+.dlg-msg{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;}
+.dlg-inp{width:100%;background:rgba(255,255,255,.07);border:0.5px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-size:13px;padding:9px 12px;outline:none;}
+.dlg-inp:focus{border-color:rgba(129,140,248,.5);}
+.dlg-btns{display:flex;gap:8px;}
+.dlg-btn{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;}
+.dbsave{background:#6366f1;color:#fff;}.dbsave:hover{background:#4f46e5;}
+.dbno{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);}.dbno:hover{background:rgba(255,255,255,.14);}
+.dbcancel{background:rgba(239,68,68,.15);color:#fca5a5;}.dbcancel:hover{background:rgba(239,68,68,.25);}
+
+/* Notification */
+#notif{position:fixed;top:14px;right:14px;z-index:9000;background:rgba(18,18,42,.98);border:0.5px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;max-width:260px;transform:translateX(290px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);}
 #notif.show{transform:translateX(0);}
 #noti{font-size:16px;margin-bottom:3px;}
 #nott{font-size:12px;color:#fff;font-weight:600;}
 #notm{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
 
-/* ── Context menu ── */
+/* Context menu */
 #ctx{position:fixed;background:rgba(18,18,38,.98);border:0.5px solid rgba(255,255,255,.1);border-radius:10px;padding:6px;z-index:8000;display:none;min-width:185px;box-shadow:0 16px 50px rgba(0,0,0,.6);}
 .cxi{padding:8px 14px;border-radius:7px;font-size:12px;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:10px;}
 .cxi:hover{background:rgba(255,255,255,.09);color:#fff;}
 .cxs{height:0.5px;background:rgba(255,255,255,.08);margin:4px 0;}
 
-/* ── Shutdown ── */
+/* Shutdown */
 #shutdown{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:99999;}
 #shutdown.show{display:flex;}
 </style>
 </head>
 <body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">⊞</div>
+    <div class="login-title">NexosOS</div>
+    <div class="login-sub">Inicia sesión para continuar</div>
+
+    <!-- Saved users list -->
+    <div id="login-users-list" class="login-users" style="display:none">
+      <div class="smsec" style="margin:0 0 4px">Usuarios guardados</div>
+    </div>
+    <div id="login-or" style="display:none;font-size:11px;color:rgba(255,255,255,.25);text-align:center">— o escribe tus datos —</div>
+
+    <div>
+      <div class="login-label">Usuario</div>
+      <input class="login-inp" id="l-user" type="text" placeholder="Nombre de usuario..." autocomplete="off">
+    </div>
+    <div>
+      <div class="login-label">Contraseña</div>
+      <input class="login-inp" id="l-pass" type="password" placeholder="Contraseña..." onkeydown="if(event.key==='Enter')loginAttempt()">
+    </div>
+    <div class="login-save-notice" id="l-save-notice">
+      🔐 Se detectó una nueva contraseña. Debes guardarla para poder iniciar sesión en el futuro.
+    </div>
+    <div class="login-err" id="l-err">Usuario o contraseña incorrectos</div>
+
+    <button class="login-save-btn" id="l-save-btn" style="display:none" onclick="loginSavePassword()">
+      💾 Guardar contraseña (obligatorio)
+    </button>
+    <button class="login-btn" id="l-enter-btn" onclick="loginAttempt()">Entrar al sistema</button>
+  </div>
+</div>
+
+<!-- ══════════════ OS ══════════════ -->
 <div id="os">
-  <!-- Desktop icons -->
-  <div class="dico" style="top:18px;left:16px"  ondblclick="openApp('files')">   <div class="di">📁</div><div class="dl">Archivos</div></div>
-  <div class="dico" style="top:106px;left:16px" ondblclick="openApp('terminal')"><div class="di">💻</div><div class="dl">Terminal</div></div>
-  <div class="dico" style="top:194px;left:16px" ondblclick="openApp('notes')">   <div class="di">📝</div><div class="dl">Notas</div></div>
-  <div class="dico" style="top:282px;left:16px" ondblclick="openApp('calc')">    <div class="di">🧮</div><div class="dl">Calculadora</div></div>
-  <div class="dico" style="top:370px;left:16px" ondblclick="openApp('music')">   <div class="di">🎵</div><div class="dl">Música</div></div>
-  <div class="dico" style="top:458px;left:16px" ondblclick="openApp('settings')"><div class="di">⚙️</div><div class="dl">Ajustes</div></div>
-  <div class="dico" style="top:18px;right:16px" ondblclick="openApp('store')">   <div class="di">🚀</div><div class="dl">Apps</div></div>
+  <div class="dico" style="top:18px;left:16px"   ondblclick="openApp('files')">   <div class="di">📁</div><div class="dl">Archivos</div></div>
+  <div class="dico" style="top:106px;left:16px"  ondblclick="openApp('terminal')"><div class="di">💻</div><div class="dl">Terminal</div></div>
+  <div class="dico" style="top:194px;left:16px"  ondblclick="openApp('notes')">   <div class="di">📝</div><div class="dl">Notas</div></div>
+  <div class="dico" style="top:282px;left:16px"  ondblclick="openApp('calc')">    <div class="di">🧮</div><div class="dl">Calculadora</div></div>
+  <div class="dico" style="top:370px;left:16px"  ondblclick="openApp('music')">   <div class="di">🎵</div><div class="dl">Música</div></div>
+  <div class="dico" style="top:458px;left:16px"  ondblclick="openApp('settings')"><div class="di">⚙️</div><div class="dl">Ajustes</div></div>
+  <div class="dico" style="top:18px;right:16px"   ondblclick="openApp('wiki')">   <div class="di">🌐</div><div class="dl">Wikipedia</div></div>
+  <div class="dico" style="top:106px;right:16px"  ondblclick="openApp('store')">  <div class="di">🚀</div><div class="dl">Apps</div></div>
+  <div id="custom-desk"></div>
 
   <!-- Start menu -->
   <div id="smenu">
-    <input type="text" id="sm-q" placeholder="🔍  Buscar aplicación..." oninput="smFilter(this.value)">
+    <input type="text" id="sm-q" placeholder="🔍  Buscar..." oninput="smFilter(this.value)">
     <div class="smsec">Sistema</div>
     <div class="smit" onclick="openApp('files');smClose()">   <span class="sico">📁</span><span class="snm">Explorador de Archivos</span></div>
     <div class="smit" onclick="openApp('terminal');smClose()"><span class="sico">💻</span><span class="snm">Terminal</span></div>
     <div class="smit" onclick="openApp('notes');smClose()">   <span class="sico">📝</span><span class="snm">Editor de Notas</span></div>
     <div class="smit" onclick="openApp('calc');smClose()">    <span class="sico">🧮</span><span class="snm">Calculadora</span></div>
-    <div class="smit" onclick="openApp('music');smClose()">   <span class="sico">🎵</span><span class="snm">Reproductor de Música</span></div>
-    <div class="smit" onclick="openApp('settings');smClose()"><span class="sico">⚙️</span><span class="snm">Ajustes del Sistema</span></div>
+    <div class="smit" onclick="openApp('music');smClose()">   <span class="sico">🎵</span><span class="snm">Música</span></div>
+    <div class="smit" onclick="openApp('wiki');smClose()">    <span class="sico">🌐</span><span class="snm">Wikipedia</span></div>
+    <div class="smit" onclick="openApp('settings');smClose()"><span class="sico">⚙️</span><span class="snm">Ajustes</span></div>
     <div class="smit" onclick="openApp('store');smClose()">   <span class="sico">🚀</span><span class="snm">Apps Lanzadas</span></div>
-    <div id="sm-custom-list"></div>
+    <div id="sm-custom"></div>
     <div class="smfoot">
       <div class="smit" onclick="doShutdown()"><span class="sico">🔴</span><span class="snm">Apagar</span></div>
-      <div class="smit" onclick="smClose()">   <span class="sico">🔒</span><span class="snm">Bloquear</span></div>
+      <div class="smit" onclick="doLogout()">  <span class="sico">🔓</span><span class="snm">Cerrar sesión</span></div>
     </div>
   </div>
 
-  <!-- Taskbar -->
   <div id="taskbar">
     <button id="start-btn" onclick="smToggle()">⊞</button>
     <div class="tsep"></div>
     <div id="tb-apps"></div>
+    <div id="tb-user" onclick="openApp('settings')" title="Perfil"></div>
     <div id="tb-clock"><div id="tb-time">--:--</div><div id="tb-date"></div></div>
   </div>
 
-  <!-- Context menu -->
   <div id="ctx">
     <div class="cxi" onclick="ctxA('notes')">   📝 Nueva nota</div>
-    <div class="cxi" onclick="ctxA('files')">   📁 Explorador</div>
+    <div class="cxi" onclick="ctxA('files')">   📁 Mis archivos</div>
+    <div class="cxi" onclick="ctxA('wiki')">    🌐 Wikipedia</div>
     <div class="cxs"></div>
     <div class="cxi" onclick="ctxA('settings')">⚙️ Ajustes</div>
     <div class="cxs"></div>
     <div class="cxi" onclick="doShutdown()">    🔴 Apagar</div>
   </div>
 
-  <!-- Notification -->
   <div id="notif"><div id="noti">🔔</div><div id="nott">NexosOS</div><div id="notm">Listo</div></div>
 </div>
 
-<!-- Shutdown -->
 <div id="shutdown">
   <div style="font-size:54px">⊞</div>
   <div style="font-size:17px;color:rgba(255,255,255,.55)" id="sd-txt">Apagando NexosOS...</div>
 </div>
 
 <script>
-// ══════════════ GLOBALS ══════════════
+// ═══ STORAGE ═══
+function lsGet(k,d){ try{ var v=localStorage.getItem('nexos_'+k); return v!==null?JSON.parse(v):d; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem('nexos_'+k,JSON.stringify(v)); }catch(e){} }
+
+// ═══ GLOBALS ═══
 var wins={}, zTop=10;
-var musicPlaying=false, musicPct=0, musicTimer=null, musicIdx=0;
-var songs=[{title:'Noche Digital',artist:'NexosOS Radio',ico:'🎶'},{title:'Luz Binaria',artist:'Synth Dreams',ico:'🌌'},{title:'Código Azul',artist:'Pixel Waves',ico:'🎸'}];
+var currentUser='';
+var wikiLang='es';
+var musicPlaying=false, musicPct=0, musicTimerID=null, musicIdx=0;
+var musicList=lsGet('music_list',[]); // [{name,dataUrl}]
 var termHist=[], histIdx=-1;
 var C={cur:'0',prev:null,op:null,waitNext:false};
+var audioEl=null; // real HTML5 audio
 
-// File system virtual
-var FS={
-  home:[
-    {t:'📁',n:'Documentos'},{t:'📁',n:'Imágenes'},{t:'📁',n:'Música'},
-    {t:'📁',n:'Videos'},{t:'📁',n:'Descargas'},{t:'📁',n:'Sistema'}
-  ],
-  docs:[
-    {t:'📄',n:'notas.txt'},{t:'📄',n:'informe.docx'},{t:'📊',n:'datos.xlsx'},
-    {t:'📄',n:'resumen.txt'},{t:'📄',n:'carta.pdf'},{t:'📄',n:'proyecto.docx'}
-  ],
-  images:[
-    {t:'🖼️',n:'foto_vacaciones.png'},{t:'🖼️',n:'perfil.jpg'},{t:'🖼️',n:'captura.png'},
-    {t:'🖼️',n:'wallpaper.jpg'},{t:'🖼️',n:'logo.svg'},{t:'🖼️',n:'banner.png'}
-  ],
-  music:[
-    {t:'🎵',n:'cancion.mp3'},{t:'🎵',n:'playlist.m3u'},{t:'🎵',n:'favoritos.mp3'},
-    {t:'🎵',n:'remix.wav'},{t:'🎵',n:'podcast.mp3'},{t:'🎶',n:'album'}
-  ],
-  videos:[
-    {t:'🎬',n:'pelicula.mp4'},{t:'🎬',n:'tutorial.avi'},{t:'🎥',n:'grabacion.mov'},
-    {t:'🎬',n:'clip.mp4'},{t:'🎬',n:'serie_ep1.mkv'},{t:'🎬',n:'intro.mp4'}
-  ],
-  downloads:[
-    {t:'📦',n:'app_setup.exe'},{t:'📦',n:'backup.zip'},{t:'📄',n:'manual.pdf'},
-    {t:'🖼️',n:'descarga.png'},{t:'📦',n:'archivo.tar.gz'},{t:'📄',n:'readme.txt'}
-  ],
-  system:[
-    {t:'🔧',n:'config.ini'},{t:'🔧',n:'system.log'},{t:'⚙️',n:'nexos.conf'},
-    {t:'📋',n:'boot.cfg'},{t:'🔑',n:'keys.dat'},{t:'📜',n:'license.txt'}
-  ],
-  trash:[]
-};
-var feSection='home';
-var feSelected=null;
+// Per-user data helpers
+function uKey(k){ return currentUser+'_'+k; }
+function getSavedNotes(){ return lsGet(uKey('notes'),[]); }
+function setSavedNotes(v){ lsSet(uKey('notes'),v); }
+function getCustomApps(){ return lsGet(uKey('apps'),[]); }
+function setCustomApps(v){ lsSet(uKey('apps'),v); }
+function getMusicList(){ return lsGet(uKey('music'),[]); }
+function setMusicList(v){ lsSet(uKey('music'),v); musicList=v; }
 
-// Custom apps (persistidas en memoria)
-var customApps=[];
+// ═══ LOGIN ═══
+var loginState='idle'; // idle | needSave
+var loginDraftUser='', loginDraftPass='';
 
-// ══════════════ CLOCK ══════════════
+function loginInit(){
+  // Load saved users
+  var users=lsGet('users',{});
+  var usernames=Object.keys(users);
+  var list=document.getElementById('login-users-list');
+  if(usernames.length>0){
+    list.style.display='block';
+    document.getElementById('login-or').style.display='block';
+    usernames.forEach(function(u){
+      var chip=document.createElement('div');
+      chip.className='login-user-chip';
+      var initials=u.substring(0,2).toUpperCase();
+      chip.innerHTML='<div class="luc-ava">'+initials+'</div><div class="luc-name">'+esc(u)+'</div>';
+      chip.onclick=function(){ document.getElementById('l-user').value=u; document.getElementById('l-pass').focus(); };
+      list.appendChild(chip);
+    });
+  }
+  // Auto-focus
+  document.getElementById('l-user').focus();
+  document.getElementById('l-pass').addEventListener('input', loginPassInput);
+}
+
+function loginPassInput(){
+  if(loginState==='needSave') return;
+  var user=document.getElementById('l-user').value.trim();
+  var pass=document.getElementById('l-pass').value;
+  var users=lsGet('users',{});
+  // If user doesn't exist yet, show save button
+  if(user && pass && !users[user]){
+    loginState='needSave';
+    loginDraftUser=user;
+    loginDraftPass=pass;
+    document.getElementById('l-save-notice').classList.add('show');
+    document.getElementById('l-save-btn').style.display='block';
+    document.getElementById('l-enter-btn').disabled=true;
+    document.getElementById('l-enter-btn').textContent='Primero guarda tu contraseña';
+  }
+}
+
+function loginSavePassword(){
+  var user=document.getElementById('l-user').value.trim();
+  var pass=document.getElementById('l-pass').value;
+  if(!user||!pass){ notify('⚠️','Error','Completa usuario y contraseña.'); return; }
+  var users=lsGet('users',{});
+  users[user]=btoa(pass); // simple encoding (not real security)
+  lsSet('users',users);
+  loginState='saved';
+  document.getElementById('l-save-notice').classList.remove('show');
+  document.getElementById('l-save-btn').style.display='none';
+  document.getElementById('l-enter-btn').disabled=false;
+  document.getElementById('l-enter-btn').textContent='Entrar al sistema';
+  notify('✅','Contraseña guardada','Ya puedes iniciar sesión con estos datos.');
+}
+
+function loginAttempt(){
+  var user=document.getElementById('l-user').value.trim();
+  var pass=document.getElementById('l-pass').value;
+  var err=document.getElementById('l-err');
+  err.classList.remove('show');
+  if(!user||!pass){ err.textContent='Completa todos los campos.'; err.classList.add('show'); return; }
+  var users=lsGet('users',{});
+  if(!users[user]){
+    // New user — must save first
+    loginDraftUser=user;
+    loginDraftPass=pass;
+    loginState='needSave';
+    document.getElementById('l-save-notice').classList.add('show');
+    document.getElementById('l-save-btn').style.display='block';
+    document.getElementById('l-enter-btn').disabled=true;
+    document.getElementById('l-enter-btn').textContent='Primero guarda tu contraseña';
+    return;
+  }
+  if(users[user]!==btoa(pass)){
+    err.textContent='Contraseña incorrecta.';
+    err.classList.add('show');
+    document.getElementById('l-pass').value='';
+    document.getElementById('l-pass').focus();
+    return;
+  }
+  // Success
+  loginEnter(user);
+}
+
+function loginEnter(user){
+  currentUser=user;
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('os').classList.add('show');
+  musicList=getMusicList();
+  smRefreshCustom();
+  renderCustomIcons();
+  initAudio();
+  document.getElementById('tb-user').textContent='👤 '+user;
+  var notes=getSavedNotes();
+  setTimeout(function(){
+    notify('✅','Bienvenido','Hola, '+user+'! '+(notes.length>0?notes.length+' nota(s) guardada(s).':''));
+  },700);
+}
+
+function doLogout(){
+  smClose();
+  Object.keys(wins).forEach(function(id){ wins[id].el.remove(); });
+  wins={};
+  updateTB();
+  if(audioEl){ audioEl.pause(); }
+  musicPlaying=false; musicIdx=0; musicPct=0;
+  currentUser='';
+  document.getElementById('os').classList.remove('show');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('l-pass').value='';
+  document.getElementById('l-err').classList.remove('show');
+  document.getElementById('l-save-notice').classList.remove('show');
+  document.getElementById('l-save-btn').style.display='none';
+  document.getElementById('l-enter-btn').disabled=false;
+  document.getElementById('l-enter-btn').textContent='Entrar al sistema';
+  loginState='idle';
+}
+
+// ═══ CLOCK ═══
 function tick(){
   var n=new Date();
   document.getElementById('tb-time').textContent=n.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
@@ -289,7 +518,7 @@ function tick(){
 }
 tick(); setInterval(tick,5000);
 
-// ══════════════ NOTIFY ══════════════
+// ═══ NOTIFY ═══
 function notify(ico,title,msg){
   document.getElementById('noti').textContent=ico;
   document.getElementById('nott').textContent=title;
@@ -300,7 +529,7 @@ function notify(ico,title,msg){
   el._t=setTimeout(function(){ el.classList.remove('show'); },3200);
 }
 
-// ══════════════ START MENU ══════════════
+// ═══ START MENU ═══
 function smToggle(){ document.getElementById('smenu').classList.toggle('open'); }
 function smClose(){  document.getElementById('smenu').classList.remove('open'); }
 function smFilter(q){
@@ -309,17 +538,18 @@ function smFilter(q){
   });
 }
 function smRefreshCustom(){
-  var list=document.getElementById('sm-custom-list');
-  if(!list) return;
-  if(customApps.length===0){ list.innerHTML=''; return; }
+  var list=document.getElementById('sm-custom'); if(!list) return;
+  var apps=getCustomApps();
+  if(apps.length===0){ list.innerHTML=''; return; }
   var html='<div class="smsec">Mis Apps</div>';
-  customApps.forEach(function(app){
-    html+='<div class="smit" onclick="openCustomApp(\''+app.id+'\');smClose()"><span class="sico">'+app.ico+'</span><span class="snm">'+esc(app.name)+'</span></div>';
+  apps.forEach(function(app){
+    var ico=app.imgData?'<img src="'+app.imgData+'" style="width:20px;height:20px;border-radius:4px;object-fit:cover;">':app.ico;
+    html+='<div class="smit" onclick="openCustomApp(\''+app.id+'\');smClose()"><span class="sico">'+ico+'</span><span class="snm">'+esc(app.name)+'</span></div>';
   });
   list.innerHTML=html;
 }
 
-// ══════════════ CONTEXT MENU ══════════════
+// ═══ CONTEXT MENU ═══
 document.getElementById('os').addEventListener('contextmenu',function(e){
   e.preventDefault();
   var m=document.getElementById('ctx');
@@ -334,7 +564,11 @@ document.addEventListener('click',function(e){
 });
 function ctxA(app){ document.getElementById('ctx').style.display='none'; openApp(app); }
 
-// ══════════════ WINDOW MANAGER ══════════════
+// ═══ UTILS ═══
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ═══ WINDOW MANAGER ═══
 function openApp(id){
   if(wins[id]){ focusWin(id); if(wins[id].min) unminWin(id); return; }
   var cfg=APPS[id]; if(!cfg) return;
@@ -342,12 +576,14 @@ function openApp(id){
   if(cfg.ready) setTimeout(cfg.ready,80);
 }
 function openCustomApp(id){
-  var app=customApps.find(function(a){ return a.id===id; });
+  var apps=getCustomApps();
+  var app=apps.find(function(a){ return a.id===id; });
   if(!app) return;
   var wid='capp_'+id;
   if(wins[wid]){ focusWin(wid); if(wins[wid].min) unminWin(wid); return; }
-  var html='<div class="iframe-wrap"><iframe srcdoc="'+escAttr(app.html)+'"></iframe></div>';
-  makeWin(wid, app.ico+' '+app.name, 700, 500, html);
+  var bodyHtml='<div class="iframe-wrap"><iframe srcdoc="'+escAttr(app.html)+'"></iframe></div>';
+  var ico=app.imgData?'<img src="'+app.imgData+'" style="height:18px;border-radius:3px;vertical-align:middle;">':app.ico;
+  makeWin(wid,ico+' '+app.name,700,500,bodyHtml);
 }
 function makeWin(id,title,w,h,bodyHtml){
   var el=document.createElement('div');
@@ -356,7 +592,7 @@ function makeWin(id,title,w,h,bodyHtml){
   var T=Math.min(40+Math.random()*60,window.innerHeight-h-60);
   el.style.cssText='width:'+w+'px;height:'+h+'px;top:'+T+'px;left:'+L+'px;z-index:'+(++zTop);
   el.innerHTML='<div class="wbar" id="bar-'+id+'">'
-    +'<button class="wbtn wclose" onclick="closeWin(\''+id+'\')"></button>'
+    +'<button class="wbtn wclose" onclick="handleClose(\''+id+'\')"></button>'
     +'<button class="wbtn wmin"   onclick="minWin(\''+id+'\')"></button>'
     +'<button class="wbtn wmax"   onclick="maxWin(\''+id+'\')"></button>'
     +'<span class="wtitle">'+title+'</span></div>'
@@ -368,10 +604,7 @@ function makeWin(id,title,w,h,bodyHtml){
     if(ev.button!==0||wins[id].saved) return;
     var osr=document.getElementById('os').getBoundingClientRect();
     var ox=ev.clientX-el.offsetLeft, oy=ev.clientY-el.offsetTop;
-    function mv(e){
-      el.style.left=Math.max(0,Math.min(e.clientX-osr.left-ox,osr.width-el.offsetWidth))+'px';
-      el.style.top=Math.max(0,Math.min(e.clientY-osr.top-oy,osr.height-el.offsetHeight-48))+'px';
-    }
+    function mv(e){ el.style.left=Math.max(0,Math.min(e.clientX-osr.left-ox,osr.width-el.offsetWidth))+'px'; el.style.top=Math.max(0,Math.min(e.clientY-osr.top-oy,osr.height-el.offsetHeight-48))+'px'; }
     function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); }
     document.addEventListener('mousemove',mv);
     document.addEventListener('mouseup',up);
@@ -379,15 +612,31 @@ function makeWin(id,title,w,h,bodyHtml){
   });
   updateTB();
 }
-function focusWin(id){
-  if(!wins[id]) return;
-  wins[id].el.style.zIndex=++zTop;
-  document.querySelectorAll('.tb-btn').forEach(function(b){ b.classList.remove('active'); });
-  var btn=document.getElementById('tbb-'+id); if(btn) btn.classList.add('active');
+function handleClose(id){
+  if(id==='notes'){
+    var ta=document.getElementById('note-ta');
+    var content=ta?ta.value.trim():'';
+    if(content){
+      showSaveDlg(
+        function(name){
+          var notes=getSavedNotes();
+          notes.push({name:name,content:content,date:new Date().toLocaleString('es-CO')});
+          setSavedNotes(notes);
+          notify('💾','Guardado','"'+name+'" guardado.');
+          feRefresh();
+          closeWin(id);
+        },
+        function(){ closeWin(id); },
+        function(){}
+      );
+      return;
+    }
+  }
+  closeWin(id);
 }
 function closeWin(id){
   if(!wins[id]) return;
-  if(id==='music'&&musicPlaying){ musicPlaying=false; clearInterval(musicTimer); }
+  if(id==='music'&&musicPlaying&&audioEl){ audioEl.pause(); musicPlaying=false; }
   wins[id].el.remove(); delete wins[id]; updateTB();
 }
 function minWin(id){ if(!wins[id]) return; wins[id].min=true; wins[id].el.style.display='none'; updateTB(); }
@@ -398,173 +647,359 @@ function maxWin(id){
   if(w.saved){ w.el.style.cssText=w.saved; w.el.style.borderRadius='14px'; w.saved=null; }
   else{ w.saved=w.el.style.cssText; w.el.style.cssText='top:0;left:0;width:100%;height:calc(100vh - 48px);z-index:'+(++zTop)+';border-radius:0;display:flex;flex-direction:column;overflow:hidden;'; }
 }
+function focusWin(id){
+  if(!wins[id]) return;
+  wins[id].el.style.zIndex=++zTop;
+  document.querySelectorAll('.tb-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn=document.getElementById('tbb-'+id); if(btn) btn.classList.add('active');
+}
 function updateTB(){
   var bar=document.getElementById('tb-apps'); bar.innerHTML='';
   Object.keys(wins).forEach(function(id){
     var btn=document.createElement('button');
     btn.className='tb-btn'+(wins[id].min?'':' active');
     btn.id='tbb-'+id;
-    // Get title from window bar
     var titleEl=document.querySelector('#win-'+id+' .wtitle');
-    btn.textContent=titleEl?titleEl.textContent:'App';
+    btn.textContent=titleEl?titleEl.textContent.substring(0,20):'App';
     btn.onclick=function(){ if(wins[id].min) unminWin(id); else focusWin(id); };
     bar.appendChild(btn);
   });
 }
 
-// ══════════════ FILE EXPLORER ══════════════
-var feNavMap={
-  home:{label:'🏠 Inicio',   key:'home'},
-  pc:  {label:'🖥️ Este PC',  key:'home'},
-  docs:{label:'📄 Documentos',key:'docs'},
-  imgs:{label:'🖼️ Imágenes', key:'images'},
-  mus: {label:'🎵 Música',   key:'music'},
-  dl:  {label:'📥 Descargas',key:'downloads'},
-  sys: {label:'🔧 Sistema',  key:'system'},
-  trash:{label:'🗑️ Papelera',key:'trash'}
-};
-var fePathNames={home:'Inicio',pc:'Este PC',docs:'Documentos',imgs:'Imágenes',mus:'Música',dl:'Descargas',sys:'Sistema',trash:'Papelera'};
+// ═══ SAVE DIALOG ═══
+function showSaveDlg(onSave,onNo,onCancel){
+  var ov=document.createElement('div'); ov.className='dlg-ov'; ov.id='dlg-ov';
+  ov.innerHTML='<div class="dlg-box">'
+    +'<div class="dlg-title">💾 ¿Guardar nota?</div>'
+    +'<div class="dlg-msg">¿Deseas guardar los cambios antes de cerrar?</div>'
+    +'<input class="dlg-inp" id="dlg-name" placeholder="Nombre del archivo..." style="display:none">'
+    +'<div class="dlg-btns">'
+    +'<button class="dlg-btn dbsave" id="dlg-save-btn" onclick="dlgSaveStep()">Guardar</button>'
+    +'<button class="dlg-btn dbno" onclick="dlgNo()">No guardar</button>'
+    +'<button class="dlg-btn dbcancel" onclick="dlgCancel()">Cancelar</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);
+  var step=1;
+  window.dlgSaveStep=function(){
+    if(step===1){ step=2; var i=document.getElementById('dlg-name'); i.style.display='block'; i.focus(); document.getElementById('dlg-save-btn').textContent='✅ Confirmar'; }
+    else{ var name=(document.getElementById('dlg-name').value.trim()||'Nota sin título'); dlgClose(); onSave(name); }
+  };
+  window.dlgNo=function(){ dlgClose(); onNo&&onNo(); };
+  window.dlgCancel=function(){ dlgClose(); onCancel&&onCancel(); };
+  window.dlgClose=function(){ var d=document.getElementById('dlg-ov'); if(d) d.remove(); };
+}
 
-function feNavigate(navId){
-  feSection=navId;
-  feSelected=null;
-  // update nav highlight
+// ═══ FILE EXPLORER ═══
+var feSection='notes';
+var feSelectedIdx=-1;
+
+function feNavigate(sec){
+  feSection=sec;
   document.querySelectorAll('.fe-nav').forEach(function(n){ n.classList.remove('on'); });
-  var active=document.getElementById('fenv-'+navId);
-  if(active) active.classList.add('on');
-  // update path
-  var pathEl=document.getElementById('fe-path');
-  if(pathEl) pathEl.textContent='/home/usuario/'+fePathNames[navId];
-  // render files
-  feRender();
+  var a=document.getElementById('fenv-'+sec); if(a) a.classList.add('on');
+  var p=document.getElementById('fe-path'); if(p) p.textContent='/nexos/'+currentUser+'/'+sec;
+  feSelectedIdx=-1;
+  feRefresh();
 }
-function feRender(){
-  var grid=document.getElementById('fe-grid');
-  if(!grid) return;
-  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
-  var items=FS[section]||[];
-  if(items.length===0){
-    grid.innerHTML='<div class="fe-empty">📭 Esta carpeta está vacía</div>';
-    return;
-  }
-  grid.innerHTML=items.map(function(f,i){
-    return '<div class="fe-item" id="fefi-'+i+'" onclick="feSelect('+i+')" ondblclick="feOpen('+i+')">'
-      +'<div class="fii">'+f.t+'</div>'
-      +'<div class="fin">'+f.n+'</div>'
-      +'</div>';
-  }).join('');
-}
-function feSelect(i){
-  feSelected=i;
-  document.querySelectorAll('.fe-item').forEach(function(el){ el.classList.remove('sel'); });
-  var el=document.getElementById('fefi-'+i); if(el) el.classList.add('sel');
-}
-function feOpen(i){
-  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
-  var items=FS[section]||[];
-  var f=items[i]; if(!f) return;
-  if(f.t==='📁'){
-    // try to navigate into subfolder
-    var found=Object.keys(feNavMap).find(function(k){ return feNavMap[k].label.indexOf(f.n)>=0; });
-    if(found) feNavigate(found);
-    else notify('📁','Carpeta','Abriendo: '+f.n);
+function feRefresh(){
+  var grid=document.getElementById('fe-grid'); if(!grid) return;
+  var html='';
+  if(feSection==='notes'){
+    var notes=getSavedNotes();
+    if(notes.length===0) html='<div class="fe-empty">📭 No hay notas guardadas.<br>Escribe en el Editor de Notas<br>y cierra para guardar.</div>';
+    else notes.forEach(function(n,i){ html+='<div class="fe-item" ondblclick="feOpenNote('+i+')" onclick="feSelItem(this,'+i+')">'+'<div class="fii">📄</div><div class="fin">'+esc(n.name)+'</div></div>'; });
+  } else if(feSection==='music'){
+    var ml=getMusicList();
+    if(ml.length===0) html='<div class="fe-empty">🎵 No hay música guardada.<br>Abre el Reproductor de Música<br>y agrega canciones.</div>';
+    else ml.forEach(function(m,i){ html+='<div class="fe-item" ondblclick="fePlayMusic('+i+')" onclick="feSelItem(this,'+i+')">'+'<div class="fii">🎵</div><div class="fin">'+esc(m.name)+'</div></div>'; });
+  } else if(feSection==='apps'){
+    var apps=getCustomApps();
+    if(apps.length===0) html='<div class="fe-empty">📭 No hay apps instaladas.<br>Ve a Apps Lanzadas para crear una.</div>';
+    else apps.forEach(function(a){ var ico=a.imgData?'<img src="'+a.imgData+'">':a.ico; html+='<div class="fe-item" ondblclick="openCustomApp(\''+a.id+'\')" onclick="feSelItem(this,-1)">'+'<div class="fii">'+ico+'</div><div class="fin">'+esc(a.name)+'</div></div>'; });
   } else {
-    notify(f.t,'Archivo',f.n+' abierto');
+    html='<div class="fe-empty">🗑️ La papelera está vacía.</div>';
+  }
+  grid.innerHTML=html;
+  var tb=document.getElementById('fe-tbns'); if(tb) tb.innerHTML='';
+}
+function feSelItem(el,idx){
+  document.querySelectorAll('#fe-grid .fe-item').forEach(function(i){ i.classList.remove('sel'); });
+  el.classList.add('sel');
+  feSelectedIdx=idx;
+  var tb=document.getElementById('fe-tbns'); if(!tb) return;
+  if(idx>=0&&(feSection==='notes'||feSection==='music')){
+    tb.innerHTML='<button class="fe-tbtn fe-tbtn-open" onclick="feOpenSel()">📂 Abrir</button>'
+      +'<button class="fe-tbtn fe-tbtn-del" onclick="feDelSel()">🗑️ Eliminar</button>';
   }
 }
-function feSaveToNotes(){
-  var section=feNavMap[feSection]?feNavMap[feSection].key:feSection;
-  var items=FS[section]||[];
-  var lines='=== Contenido de '+fePathNames[feSection]+' ===\n\n';
-  items.forEach(function(f,i){ lines+=(i+1)+'. '+f.t+' '+f.n+'\n'; });
-  lines+='\n[Guardado desde Explorador de Archivos — NexosOS]';
-  // Open notes and inject
+function feOpenSel(){
+  if(feSelectedIdx<0) return;
+  if(feSection==='notes') feOpenNote(feSelectedIdx);
+  else if(feSection==='music') fePlayMusic(feSelectedIdx);
+}
+function feOpenNote(i){
+  var notes=getSavedNotes(); var n=notes[i]; if(!n) return;
   openApp('notes');
-  setTimeout(function(){
-    var ta=document.getElementById('note-ta');
-    if(ta){
-      ta.value=(ta.value?ta.value+'\n\n':'')+lines;
-      noteInput();
-      notify('💾','Guardado en Notas','Contenido de '+fePathNames[feSection]+' copiado');
-    }
-  },150);
+  setTimeout(function(){ var ta=document.getElementById('note-ta'); if(ta){ ta.value=n.content; noteInput(); notify('📄','Nota abierta',n.name); } },150);
+}
+function fePlayMusic(i){
+  var ml=getMusicList(); var m=ml[i]; if(!m) return;
+  musicIdx=i; musicList=ml;
+  openApp('music');
+  setTimeout(function(){ mLoadTrack(i); },150);
+}
+function feDelSel(){
+  if(feSelectedIdx<0) return;
+  if(feSection==='notes'){
+    var notes=getSavedNotes(); var name=notes[feSelectedIdx].name;
+    notes.splice(feSelectedIdx,1); setSavedNotes(notes);
+    notify('🗑️','Eliminada','"'+name+'" eliminada.'); feSelectedIdx=-1; feRefresh();
+  } else if(feSection==='music'){
+    var ml=getMusicList(); var name=ml[feSelectedIdx].name;
+    ml.splice(feSelectedIdx,1); setMusicList(ml);
+    mRefreshPlaylist(); notify('🗑️','Eliminada','"'+name+'" eliminada.'); feSelectedIdx=-1; feRefresh();
+  }
 }
 
-// ══════════════ TERMINAL ══════════════
+// ═══ TERMINAL ═══
 function termKey(e){
   var inp=document.getElementById('term-in'); if(!inp) return;
   if(e.key==='Enter'){ var cmd=inp.value.trim(); inp.value=''; runCmd(cmd); }
   else if(e.key==='ArrowUp'){ e.preventDefault(); histIdx=Math.min(histIdx+1,termHist.length-1); if(histIdx>=0) inp.value=termHist[histIdx]; }
   else if(e.key==='ArrowDown'){ e.preventDefault(); histIdx=Math.max(histIdx-1,-1); inp.value=histIdx>=0?termHist[histIdx]:''; }
 }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function runCmd(cmd){
   if(cmd){ termHist.unshift(cmd); histIdx=-1; }
   var out=document.getElementById('term-out'); if(!out) return;
   function ln(txt,cls){ var d=document.createElement('div'); d.className='tl'+(cls?' '+cls:''); d.textContent=txt; out.appendChild(d); }
-  if(cmd){ var r=document.createElement('div'); r.className='tl'; r.innerHTML='<span class="tprompt">usuario@nexos:~$</span> <span class="tcmd">'+esc(cmd)+'</span>'; out.appendChild(r); }
+  if(cmd){ var r=document.createElement('div'); r.className='tl'; r.innerHTML='<span class="tprompt">'+esc(currentUser)+'@nexos:~$</span> <span class="tcmd">'+esc(cmd)+'</span>'; out.appendChild(r); }
   var p=cmd.toLowerCase().trim().split(/\s+/);
   var cmds={
     '':function(){},
-    help:function(){ ln('Comandos disponibles:','tinfo'); [['ls','listar archivos'],['pwd','directorio'],['whoami','usuario'],['date','fecha/hora'],['uname','sistema'],['echo [txt]','imprimir'],['clear','limpiar'],['cal','calendario'],['ps','procesos'],['df','espacio'],['uptime','tiempo activo'],['mkdir [n]','crear carpeta'],['rm [n]','eliminar']].forEach(function(x){ ln('  '+x[0].padEnd(16)+x[1]); }); },
-    ls:function(){ ln('📁 documentos  📁 imágenes  📁 música  📁 videos'); ln('📄 notas.txt  📊 datos.xlsx  🖼️ foto.png  🎵 cancion.mp3'); },
-    pwd:function(){ ln('/home/usuario'); },
-    whoami:function(){ ln('usuario'); },
+    help:function(){ ln('Comandos disponibles:','tinfo'); [['ls','listar archivos'],['pwd','directorio'],['whoami','usuario actual'],['date','fecha y hora'],['uname','sistema'],['echo [txt]','imprimir'],['clear','limpiar'],['notes','mis notas'],['music','mi música'],['apps','mis apps'],['ps','procesos'],['df','espacio'],['uptime','tiempo activo']].forEach(function(x){ ln('  '+x[0].padEnd(16)+x[1]); }); },
+    ls:function(){ ln('📄 Notas ('+getSavedNotes().length+')  🎵 Música ('+getMusicList().length+')  🚀 Apps ('+getCustomApps().length+')'); },
+    notes:function(){ var n=getSavedNotes(); if(!n.length){ ln('(sin notas)'); return; } n.forEach(function(x,i){ ln((i+1)+'. 📄 '+x.name+' — '+x.date); }); },
+    music:function(){ var m=getMusicList(); if(!m.length){ ln('(sin música)'); return; } m.forEach(function(x,i){ ln((i+1)+'. 🎵 '+x.name); }); },
+    apps:function(){ var a=getCustomApps(); if(!a.length){ ln('(sin apps)'); return; } a.forEach(function(x,i){ ln((i+1)+'. '+x.ico+' '+x.name); }); },
+    pwd:function(){ ln('/home/'+currentUser); },
+    whoami:function(){ ln(currentUser); },
     date:function(){ ln(new Date().toLocaleString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})); },
     uname:function(){ ln('NexosOS 1.0.0 — x86_64 — NexosKernel 5.0'); },
     echo:function(){ ln(cmd.length>5?cmd.substring(5):''); },
     clear:function(){ out.innerHTML=''; return; },
-    ps:function(){ ln('PID    PROCESO            ESTADO'); [['1001','nexos-shell','ejecutando'],['1042','nexos-wm','ejecutando'],['1100','nexos-taskbar','ejecutando'],['1234','terminal','ejecutando']].forEach(function(r){ ln(r[0]+'   '+r[1].padEnd(19)+r[2]); }); },
-    df:function(){ ln('DISPOSITIVO   TAMAÑO  USADO  LIBRE  USO%'); ln('/dev/sda1     256 GB   42 GB  214 GB  16%'); ln('tmpfs           4 GB  0.2 GB  3.8 GB   5%'); },
-    uptime:function(){ ln('Activo: '+Math.floor(Math.random()*24)+'h '+Math.floor(Math.random()*60)+'m  |  Carga: 0.12, 0.08, 0.05'); },
-    cal:function(){ ln(new Date().toLocaleDateString('es-CO',{month:'long',year:'numeric'}).toUpperCase(),'tinfo'); ln('Lu  Ma  Mi  Ju  Vi  Sa  Do'); },
-    mkdir:function(){ ln(p[1]?'Carpeta "'+p[1]+'" creada.':'uso: mkdir <nombre>'); },
-    rm:function(){ ln(p[1]?'"'+p[1]+'" eliminado.':'uso: rm <archivo>'); }
+    ps:function(){ ln('PID    PROCESO            ESTADO'); [['1001','nexos-shell','ejecutando'],['1042','nexos-wm','ejecutando'],['1100','taskbar','ejecutando']].forEach(function(r){ ln(r[0]+'   '+r[1].padEnd(18)+r[2]); }); },
+    df:function(){ var n=getSavedNotes().length,m=getMusicList().length,a=getCustomApps().length; ln('Notas: '+n+' archivo(s)  Música: '+m+' pista(s)  Apps: '+a+' instalada(s)'); },
+    uptime:function(){ ln('Activo: '+Math.floor(Math.random()*24)+'h '+Math.floor(Math.random()*60)+'m'); }
   };
   var h=cmds[p[0]]; if(h) h(); else if(cmd) ln(p[0]+': no encontrado. Escribe "help"','terr');
   var wrap=document.getElementById('term-wrap'); if(wrap) wrap.scrollTop=wrap.scrollHeight;
 }
 
-// ══════════════ NOTES ══════════════
+// ═══ NOTES ═══
 function noteInput(){
-  var ta=document.getElementById('note-ta');
-  var st=document.getElementById('note-st');
+  var ta=document.getElementById('note-ta'); var st=document.getElementById('note-st');
   if(!ta||!st) return;
-  var txt=ta.value;
-  var w=txt.trim()===''?0:txt.trim().split(/\s+/).length;
+  var txt=ta.value; var w=txt.trim()===''?0:txt.trim().split(/\s+/).length;
   st.textContent=w+' palabras · '+txt.length+' caracteres';
 }
-function noteSave(){ notify('💾','Guardado','Nota guardada correctamente.'); }
-function noteClear(){ var ta=document.getElementById('note-ta'); if(ta){ ta.value=''; noteInput(); } }
-function noteCopy(){
+function noteSaveManual(){
   var ta=document.getElementById('note-ta'); if(!ta) return;
-  if(navigator.clipboard){ navigator.clipboard.writeText(ta.value).then(function(){ notify('📋','Copiado','Texto copiado.'); }); }
-  else notify('⚠️','Error','No se pudo copiar.');
+  var content=ta.value.trim();
+  if(!content){ notify('⚠️','','Escribe algo primero.'); return; }
+  showSaveDlg(function(name){ var notes=getSavedNotes(); notes.push({name:name,content:content,date:new Date().toLocaleString('es-CO')}); setSavedNotes(notes); notify('💾','Guardado','"'+name+'" guardado.'); feRefresh(); }, null, null);
 }
+function noteClear(){ var ta=document.getElementById('note-ta'); if(ta){ ta.value=''; noteInput(); } }
+function noteCopy(){ var ta=document.getElementById('note-ta'); if(!ta) return; if(navigator.clipboard) navigator.clipboard.writeText(ta.value).then(function(){ notify('📋','Copiado','Texto copiado.'); }); }
 
-// ══════════════ CALCULATOR ══════════════
+// ═══ CALCULATOR ═══
 function cDisp(){ var el=document.getElementById('calc-cur'); if(!el) return; var v=C.cur; if(v!=='Error'&&v.length>13) v=parseFloat(v).toExponential(5); el.textContent=v; }
 function cHistSet(t){ var el=document.getElementById('calc-hist'); if(el) el.textContent=t||''; }
 function opLbl(op){ return{'+':'+','-':'−','*':'×','/':'÷'}[op]||op; }
 function cNum(n){ if(C.waitNext){ C.cur=n; C.waitNext=false; } else { if(C.cur==='Error') C.cur='0'; if(C.cur.replace('-','').replace('.','').length>=12) return; C.cur=(C.cur==='0')?n:C.cur+n; } cDisp(); }
 function cDot(){ if(C.waitNext){ C.cur='0.'; C.waitNext=false; cDisp(); return; } if(C.cur==='Error') C.cur='0'; if(C.cur.indexOf('.')===-1) C.cur+='.'; cDisp(); }
 function cOp(op){ if(C.cur==='Error'){ cAC(); return; } if(C.op!==null&&!C.waitNext) cCompute(false); C.prev=parseFloat(C.cur); C.op=op; C.waitNext=true; cHistSet(C.prev+' '+opLbl(op)); }
-function cCompute(showH){ if(C.op===null) return; var a=C.prev,b=parseFloat(C.cur),r; if(C.op==='+') r=a+b; else if(C.op==='-') r=a-b; else if(C.op==='*') r=a*b; else if(C.op==='/') r=b!==0?a/b:NaN; if(showH) cHistSet(a+' '+opLbl(C.op)+' '+b+' ='); if(isNaN(r)||!isFinite(r)) C.cur='Error'; else C.cur=String(parseFloat(r.toPrecision(12))); C.op=null; C.prev=null; C.waitNext=true; cDisp(); }
+function cCompute(showH){ if(C.op===null) return; var a=C.prev,b=parseFloat(C.cur),r; if(C.op==='+') r=a+b; else if(C.op==='-') r=a-b; else if(C.op==='*') r=a*b; else if(C.op==='/') r=b!==0?a/b:NaN; if(showH) cHistSet(a+' '+opLbl(C.op)+' '+b+' ='); C.cur=(isNaN(r)||!isFinite(r))?'Error':String(parseFloat(r.toPrecision(12))); C.op=null; C.prev=null; C.waitNext=true; cDisp(); }
 function cEquals(){ if(C.op===null){ cHistSet(''); return; } cCompute(true); }
 function cAC(){ C={cur:'0',prev:null,op:null,waitNext:false}; cDisp(); cHistSet(''); }
 function cSign(){ if(C.cur==='0'||C.cur==='Error') return; C.cur=C.cur.charAt(0)==='-'?C.cur.slice(1):'-'+C.cur; cDisp(); }
 function cPct(){ if(C.cur==='Error') return; C.cur=String(parseFloat(C.cur)/100); cDisp(); }
 
-// ══════════════ MUSIC ══════════════
-function mSetUI(){ var s=songs[musicIdx]; var d=document.getElementById('mus-disc'),nm=document.getElementById('mus-name'),ar=document.getElementById('mus-art'); if(d) d.textContent=s.ico; if(nm) nm.textContent=s.title; if(ar) ar.textContent=s.artist; mFill(); mBtn(); }
-function mFill(){ var f=document.getElementById('mus-fill'); if(f) f.style.width=musicPct+'%'; }
-function mBtn(){ var btn=document.getElementById('mus-play'),d=document.getElementById('mus-disc'); if(btn) btn.textContent=musicPlaying?'⏸':'▶'; if(d) d.classList.toggle('spin',musicPlaying); }
-function mToggle(){ musicPlaying=!musicPlaying; mBtn(); if(musicPlaying){ musicTimer=setInterval(function(){ musicPct=Math.min(musicPct+0.4,100); mFill(); if(musicPct>=100) mNext(); },200); } else clearInterval(musicTimer); }
-function mPrev(){ musicIdx=(musicIdx-1+songs.length)%songs.length; musicPct=0; mSetUI(); }
-function mNext(){ musicIdx=(musicIdx+1)%songs.length; musicPct=0; mSetUI(); notify('🎵','Siguiente',songs[musicIdx].title+' — '+songs[musicIdx].artist); }
+// ═══ MUSIC PLAYER (real HTML5 audio) ═══
+function initAudio(){
+  if(!audioEl){
+    audioEl=document.createElement('audio');
+    audioEl.addEventListener('timeupdate', mTimeUpdate);
+    audioEl.addEventListener('ended', mEnded);
+    audioEl.addEventListener('error', function(){ notify('⚠️','Error de audio','No se pudo reproducir este archivo.'); });
+  }
+  musicList=getMusicList();
+}
+function mAddFiles(){
+  var inp=document.createElement('input');
+  inp.type='file'; inp.accept='audio/*'; inp.multiple=true;
+  inp.onchange=function(){
+    var files=Array.from(inp.files);
+    var ml=getMusicList();
+    var count=0;
+    files.forEach(function(file){
+      var reader=new FileReader();
+      reader.onload=function(e){
+        ml.push({name:file.name.replace(/\.[^/.]+$/,''), dataUrl:e.target.result});
+        setMusicList(ml);
+        count++;
+        if(count===files.length){
+          mRefreshPlaylist();
+          feRefresh();
+          notify('🎵','Música agregada',count+' pista(s) guardada(s).');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  inp.click();
+}
+function mLoadTrack(idx){
+  var ml=getMusicList();
+  if(idx<0||idx>=ml.length) return;
+  musicIdx=idx;
+  audioEl.src=ml[idx].dataUrl;
+  audioEl.load();
+  audioEl.play().then(function(){ musicPlaying=true; mUpdateUI(); }).catch(function(){});
+}
+function mToggle(){
+  if(!audioEl) return;
+  var ml=getMusicList();
+  if(ml.length===0){ notify('🎵','Sin música','Agrega canciones primero.'); return; }
+  if(!audioEl.src||audioEl.src===window.location.href){ mLoadTrack(0); return; }
+  if(musicPlaying){ audioEl.pause(); musicPlaying=false; }
+  else { audioEl.play(); musicPlaying=true; }
+  mUpdateUI();
+}
+function mPrev(){ var ml=getMusicList(); if(!ml.length) return; musicIdx=(musicIdx-1+ml.length)%ml.length; mLoadTrack(musicIdx); }
+function mNext(){ var ml=getMusicList(); if(!ml.length) return; musicIdx=(musicIdx+1)%ml.length; mLoadTrack(musicIdx); }
+function mEnded(){ mNext(); }
+function mTimeUpdate(){
+  if(!audioEl||isNaN(audioEl.duration)) return;
+  var pct=audioEl.currentTime/audioEl.duration*100;
+  musicPct=pct;
+  var fill=document.getElementById('mus-fill'); if(fill) fill.style.width=pct+'%';
+  var ct=document.getElementById('mus-ct'),dt=document.getElementById('mus-dt');
+  if(ct) ct.textContent=fmtTime(audioEl.currentTime);
+  if(dt) dt.textContent=fmtTime(audioEl.duration);
+}
+function fmtTime(s){ if(isNaN(s)) return '0:00'; var m=Math.floor(s/60); var ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; }
+function mUpdateUI(){
+  var ml=getMusicList();
+  var disc=document.getElementById('mus-disc');
+  var nm=document.getElementById('mus-name');
+  var ar=document.getElementById('mus-art');
+  if(disc) disc.classList.toggle('spin',musicPlaying);
+  var playBtn=document.getElementById('mus-play');
+  if(playBtn) playBtn.textContent=musicPlaying?'⏸':'▶';
+  if(ml[musicIdx]){
+    if(nm) nm.textContent=ml[musicIdx].name;
+    if(ar) ar.textContent='Pista '+(musicIdx+1)+' de '+ml.length;
+  } else {
+    if(nm) nm.textContent='Sin música';
+    if(ar) ar.textContent='Agrega canciones';
+  }
+  mRefreshPlaylist();
+}
+function mRefreshPlaylist(){
+  var list=document.getElementById('mus-playlist'); if(!list) return;
+  var ml=getMusicList();
+  if(ml.length===0){ list.innerHTML='<div style="padding:8px;font-size:11px;color:rgba(255,255,255,.3)">Sin canciones. Usa el botón + para agregar.</div>'; return; }
+  list.innerHTML=ml.map(function(m,i){
+    return '<div class="mpl-item'+(i===musicIdx?' active':'')+'" onclick="mLoadTrack('+i+')">'
+      +'<span class="mpi-ico">🎵</span>'
+      +'<span class="mpi-name">'+esc(m.name)+'</span>'
+      +'</div>';
+  }).join('');
+}
+function mSeek(e){
+  if(!audioEl||isNaN(audioEl.duration)) return;
+  var bar=document.getElementById('mprog-bar'); if(!bar) return;
+  var rect=bar.getBoundingClientRect();
+  var pct=(e.clientX-rect.left)/rect.width;
+  audioEl.currentTime=pct*audioEl.duration;
+}
 
-// ══════════════ SETTINGS TABS ══════════════
+// ═══ WIKIPEDIA ═══
+function wikiSearch(){
+  var q=document.getElementById('wiki-q'); if(!q) return;
+  var query=q.value.trim(); if(!query) return;
+  var result=document.getElementById('wiki-result');
+  result.innerHTML='<div class="wiki-loading"><div class="wiki-spinner"></div><span>Buscando: "'+esc(query)+'"...</span></div>';
+  var lang=wikiLang;
+  var searchUrl='https://'+lang+'.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(query)+'&format=json&origin=*&srlimit=3';
+  fetch(searchUrl)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var res=data.query&&data.query.search;
+      if(!res||!res.length){ result.innerHTML='<div class="wiki-loading"><span>❌ Sin resultados para "'+esc(query)+'"</span></div>'; return; }
+      return res[0].title;
+    })
+    .then(function(title){
+      if(!title) return;
+      var pageUrl='https://'+lang+'.wikipedia.org/w/api.php?action=parse&page='+encodeURIComponent(title)+'&prop=text|displaytitle|sections&format=json&origin=*&disabletoc=1';
+      return fetch(pageUrl).then(function(r){ return r.json(); }).then(function(data){
+        if(!data||!data.parse){ result.innerHTML='<div class="wiki-loading"><span>❌ Error al cargar.</span></div>'; return; }
+        result.innerHTML=renderWikiPage(data.parse);
+        result.querySelectorAll('a.wlink').forEach(function(a){
+          a.addEventListener('click',function(e){ e.preventDefault(); var qEl=document.getElementById('wiki-q'); if(qEl){ qEl.value=a.getAttribute('data-title'); wikiSearch(); } });
+        });
+        result.scrollTop=0;
+      });
+    })
+    .catch(function(){ result.innerHTML='<div class="wiki-loading"><span>❌ Error de conexión.</span></div>'; });
+}
+
+function renderWikiPage(parse){
+  var parser=new DOMParser();
+  var doc=parser.parseFromString(parse.text['*'],'text/html');
+  // Remove noise
+  ['sup.reference','.mw-editsection','.reflist','.references','#References','.navbox',
+   '.sistersitebox','.mw-empty-elt','div.hatnote table','div.metadata'
+  ].forEach(function(sel){ doc.querySelectorAll(sel).forEach(function(el){ el.remove(); }); });
+  // Fix images
+  doc.querySelectorAll('img').forEach(function(img){
+    var src=img.getAttribute('src')||'';
+    if(src.startsWith('//')) img.src='https:'+src;
+    else if(src.startsWith('/')) img.src='https://'+wikiLang+'.wikipedia.org'+src;
+    img.removeAttribute('srcset');
+    img.style.cssText='max-width:200px;border-radius:6px;margin:8px 0 8px 16px;float:right;opacity:.85;';
+  });
+  // Fix links
+  doc.querySelectorAll('a[href]').forEach(function(a){
+    var href=a.getAttribute('href')||'';
+    if(href.startsWith('/wiki/')){
+      var title=decodeURIComponent(href.replace('/wiki/','')).replace(/_/g,' ');
+      a.setAttribute('data-title',title);
+      a.className='wlink';
+      a.removeAttribute('href');
+    } else {
+      a.removeAttribute('href');
+      a.style.color='inherit';
+    }
+  });
+  var title=parse.displaytitle||parse.title;
+  return '<div id="wiki-content">'
+    +'<h1>'+title+'</h1>'
+    +doc.body.innerHTML
+    +'<div style="border-top:0.5px solid rgba(255,255,255,.08);margin-top:20px;padding-top:12px;font-size:11px;color:rgba(255,255,255,.25);text-align:center;">'
+    +'Fuente: Wikipedia ('+wikiLang+') — '
+    +'<span style="color:#818cf8;cursor:pointer" onclick="window.open(\'https://'+wikiLang+'.wikipedia.org/wiki/'+encodeURIComponent(title)+'\')">Ver en Wikipedia ↗</span>'
+    +'</div></div>';
+}
+
+function wikiKeydown(e){ if(e.key==='Enter') wikiSearch(); }
+function wikiSuggest(t){ var q=document.getElementById('wiki-q'); if(q){ q.value=t; wikiSearch(); } }
+function wikiSetLang(lang){
+  wikiLang=lang;
+  document.querySelectorAll('.wiki-lang-btn').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-lang')===lang); });
+}
+
+// ═══ SETTINGS TABS ═══
 function setTab(btn,tabId){
   var nav=btn.closest('.set-nav');
   if(!nav) return;
@@ -575,8 +1010,9 @@ function setTab(btn,tabId){
   });
 }
 
-// ══════════════ APP STORE (CUSTOM APPS) ══════════════
-function storeTab(btn, panel){
+// ═══ APP STORE ═══
+var appImgData='';
+function storeTab(btn,panel){
   document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('on'); });
   btn.classList.add('on');
   document.querySelectorAll('.store-panel').forEach(function(p){ p.style.display='none'; });
@@ -584,132 +1020,124 @@ function storeTab(btn, panel){
   if(panel==='sp-apps') storeRender();
 }
 function storeRender(){
-  var grid=document.getElementById('apps-grid');
-  if(!grid) return;
-  if(customApps.length===0){
-    grid.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center;">No hay apps instaladas aún.<br>Ve a "Agregar App" para crear una.</div>';
-    return;
-  }
-  grid.innerHTML=customApps.map(function(app){
+  var grid=document.getElementById('apps-grid'); if(!grid) return;
+  var apps=getCustomApps();
+  if(!apps.length){ grid.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center">No hay apps. Ve a ➕ Agregar App.</div>'; return; }
+  grid.innerHTML=apps.map(function(app){
+    var ico=app.imgData?'<img src="'+app.imgData+'">':app.ico;
     return '<div class="app-card-wrap">'
       +'<div class="app-card" ondblclick="openCustomApp(\''+app.id+'\')">'
-      +'<div class="aco">'+app.ico+'</div>'
+      +'<div class="aco">'+ico+'</div>'
       +'<div class="acn">'+esc(app.name)+'</div>'
-      +'<div class="acd">Personalizada</div>'
       +'</div>'
-      +'<button class="del-btn" onclick="deleteApp(\''+app.id+'\')">✕</button>'
+      +'<button class="acwdel" onclick="deleteApp(\''+app.id+'\')">✕</button>'
       +'</div>';
   }).join('');
 }
-function deleteApp(id){
-  customApps=customApps.filter(function(a){ return a.id!==id; });
-  storeRender();
-  smRefreshCustom();
-  // also add desktop icon update
-  renderCustomDesktopIcons();
-  notify('🗑️','App eliminada','La app fue removida del sistema.');
+function appPickImage(){
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){
+    var file=inp.files[0]; if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      appImgData=e.target.result;
+      var prev=document.getElementById('app-img-preview');
+      var txt=document.getElementById('app-img-txt');
+      if(prev){ prev.src=appImgData; prev.style.display='block'; }
+      if(txt) txt.textContent='Imagen cargada ✓';
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
 }
 function addApp(){
   var name=document.getElementById('app-name').value.trim();
-  var ico=document.getElementById('app-ico').value.trim()||'🔵';
   var html=document.getElementById('app-html').value.trim();
-  if(!name){ notify('⚠️','Error','Ingresa un nombre para la app.'); return; }
-  if(!html){ notify('⚠️','Error','Ingresa el código HTML de la app.'); return; }
+  if(!name){ notify('⚠️','Error','Ingresa un nombre.'); return; }
+  if(!html){ notify('⚠️','Error','Ingresa el código HTML.'); return; }
   var id='app_'+Date.now();
-  customApps.push({id:id, name:name, ico:ico, html:html});
-  storeRender();
-  smRefreshCustom();
-  renderCustomDesktopIcons();
-  // clear form
+  var apps=getCustomApps();
+  apps.push({id:id,name:name,ico:'🔵',imgData:appImgData||'',html:html});
+  setCustomApps(apps);
+  appImgData='';
   document.getElementById('app-name').value='';
   document.getElementById('app-html').value='';
-  document.getElementById('app-ico').value='';
-  notify('🚀','App instalada','"'+name+'" está lista. Doble clic para abrirla.');
-  // switch to apps tab
-  var tabBtn=document.getElementById('tab-apps');
-  if(tabBtn) storeTab(tabBtn,'sp-apps');
+  var prev=document.getElementById('app-img-preview'); if(prev){ prev.src=''; prev.style.display='none'; }
+  var txt=document.getElementById('app-img-txt'); if(txt) txt.textContent='Haz clic para subir imagen del explorador de archivos';
+  storeRender(); smRefreshCustom(); renderCustomIcons(); feRefresh();
+  notify('🚀','App instalada','"'+name+'" lista.');
+  var tb=document.getElementById('tab-apps'); if(tb) storeTab(tb,'sp-apps');
 }
-
-// Render custom app icons on desktop
-function renderCustomDesktopIcons(){
-  // remove old custom icons
-  document.querySelectorAll('.dico-custom').forEach(function(el){ el.remove(); });
-  var os=document.getElementById('os');
-  customApps.forEach(function(app, i){
+function deleteApp(id){
+  var apps=getCustomApps().filter(function(a){ return a.id!==id; });
+  setCustomApps(apps);
+  storeRender(); smRefreshCustom(); renderCustomIcons(); feRefresh();
+  notify('🗑️','App eliminada','Removida del sistema.');
+}
+function renderCustomIcons(){
+  var c=document.getElementById('custom-desk'); if(!c) return;
+  c.innerHTML='';
+  getCustomApps().forEach(function(app,i){
     var d=document.createElement('div');
-    d.className='dico dico-custom';
-    // place them on right side
-    var top=18+(i*88);
-    d.style.cssText='top:'+(top+100)+'px;right:16px;';
-    d.innerHTML='<div class="di">'+app.ico+'</div><div class="dl">'+esc(app.name)+'</div>';
+    d.className='dico';
+    d.style.cssText='top:'+(194+i*88)+'px;right:16px;';
+    var ico=app.imgData?'<img src="'+app.imgData+'" style="width:34px;height:34px;border-radius:8px;object-fit:cover;">':app.ico;
+    d.innerHTML='<div class="di" style="font-size:34px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:8px;">'+ico+'</div><div class="dl">'+esc(app.name)+'</div>';
     d.ondblclick=(function(id){ return function(){ openCustomApp(id); }; })(app.id);
-    os.appendChild(d);
+    c.appendChild(d);
   });
 }
 
-// ══════════════ SHUTDOWN ══════════════
+// ═══ SHUTDOWN ═══
 function doShutdown(){
   smClose();
   var sd=document.getElementById('shutdown'); sd.classList.add('show');
   setTimeout(function(){
-    document.getElementById('sd-txt').innerHTML='NexosOS apagado &nbsp;<button onclick="location.reload()" style="margin-top:12px;padding:8px 22px;background:rgba(99,102,241,.85);border:none;border-radius:8px;color:#fff;font-size:13px;cursor:pointer;display:block;">Reiniciar</button>';
+    document.getElementById('sd-txt').innerHTML='NexosOS apagado<br><button onclick="location.reload()" style="margin-top:14px;padding:8px 24px;background:rgba(99,102,241,.85);border:none;border-radius:8px;color:#fff;font-size:13px;cursor:pointer;">Reiniciar</button>';
   },2200);
 }
 
-// ══════════════ APP DEFINITIONS ══════════════
+// ═══ APP DEFINITIONS ═══
 var APPS={
-
   files:{
-    title:'📁 Explorador de Archivos', w:660, h:420,
+    title:'📁 Explorador de Archivos',w:660,h:420,
     html:function(){
-      feSection='home'; feSelected=null;
-      var navs=[
-        {id:'home',  label:'🏠 Inicio',    on:true},
-        {id:'pc',    label:'🖥️ Este PC',   on:false},
-        {id:'docs',  label:'📄 Documentos',on:false},
-        {id:'imgs',  label:'🖼️ Imágenes',  on:false},
-        {id:'mus',   label:'🎵 Música',    on:false},
-        {id:'dl',    label:'📥 Descargas', on:false},
-        {id:'sys',   label:'🔧 Sistema',   on:false},
-        {id:'trash', label:'🗑️ Papelera',  on:false}
-      ];
-      var sideHtml=navs.map(function(n){
-        return '<div class="fe-nav'+(n.on?' on':'')+'" id="fenv-'+n.id+'" onclick="feNavigate(\''+n.id+'\')">'+(n.label)+'</div>';
-      }).join('');
-      var fileItems=FS.home.map(function(f,i){
-        return '<div class="fe-item" id="fefi-'+i+'" onclick="feSelect('+i+')" ondblclick="feOpen('+i+')">'
-          +'<div class="fii">'+f.t+'</div><div class="fin">'+f.n+'</div></div>';
-      }).join('');
+      feSection='notes';
       return '<div class="fe-wrap">'
-        +'<div class="fe-side">'+sideHtml+'</div>'
+        +'<div class="fe-side">'
+        +'<div class="fe-nav on" id="fenv-notes" onclick="feNavigate(\'notes\')">📝 Notas</div>'
+        +'<div class="fe-nav"    id="fenv-music" onclick="feNavigate(\'music\')">🎵 Música</div>'
+        +'<div class="fe-nav"    id="fenv-apps"  onclick="feNavigate(\'apps\')">🚀 Apps</div>'
+        +'<div class="fe-nav"    id="fenv-trash" onclick="feNavigate(\'trash\')">🗑️ Papelera</div>'
+        +'</div>'
         +'<div class="fe-main">'
         +'<div class="fe-toolbar">'
-        +'<span class="fe-path" id="fe-path">/home/usuario/Inicio</span>'
-        +'<button class="fe-savebtn" onclick="feSaveToNotes()">💾 Guardar en Notas</button>'
+        +'<span class="fe-path" id="fe-path">/nexos/'+currentUser+'/notes</span>'
+        +'<span id="fe-tbns" style="display:flex;gap:6px;"></span>'
         +'</div>'
-        +'<div class="fe-grid" id="fe-grid">'+fileItems+'</div>'
+        +'<div class="fe-grid" id="fe-grid"></div>'
         +'</div></div>';
     },
-    ready:function(){}
+    ready:function(){ feRefresh(); }
   },
 
   terminal:{
-    title:'💻 Terminal', w:560, h:360,
+    title:'💻 Terminal',w:560,h:360,
     html:function(){
-      return '<div id="term-wrap"><div class="tl tinfo">NexosOS Terminal v1.0 &mdash; escribe "help" para ver comandos</div><div class="tl">&nbsp;</div><div id="term-out"></div><div id="term-row"><span class="tprompt">usuario@nexos:~$&nbsp;</span><input id="term-in" type="text" autocomplete="off" spellcheck="false" onkeydown="termKey(event)" placeholder="escribe un comando..."></div></div>';
+      return '<div id="term-wrap"><div class="tl tinfo">NexosOS Terminal — escribe "help" para comandos</div><div class="tl">&nbsp;</div><div id="term-out"></div><div id="term-row"><span class="tprompt">'+esc(currentUser)+'@nexos:~$&nbsp;</span><input id="term-in" type="text" autocomplete="off" spellcheck="false" onkeydown="termKey(event)" placeholder="escribe un comando..."></div></div>';
     },
     ready:function(){ var i=document.getElementById('term-in'); if(i) i.focus(); }
   },
 
   notes:{
-    title:'📝 Editor de Notas', w:480, h:380,
+    title:'📝 Editor de Notas',w:500,h:400,
     html:function(){
-      return '<div class="note-wrap"><div class="note-bar"><button onclick="noteSave()">💾 Guardar</button><button onclick="noteClear()">🗑️ Limpiar</button><button onclick="noteCopy()">📋 Copiar</button></div><textarea id="note-ta" placeholder="Empieza a escribir aquí..." oninput="noteInput()"></textarea><div id="note-st">0 palabras · 0 caracteres</div></div>';
+      return '<div class="note-wrap"><div class="note-bar"><button onclick="noteSaveManual()">💾 Guardar</button><button onclick="noteClear()">🗑️ Limpiar</button><button onclick="noteCopy()">📋 Copiar</button></div><textarea id="note-ta" placeholder="Escribe aquí...&#10;Al cerrar te preguntará si deseas guardar." oninput="noteInput()"></textarea><div id="note-st">0 palabras · 0 caracteres</div></div>';
     }
   },
 
   calc:{
-    title:'🧮 Calculadora', w:300, h:440,
+    title:'🧮 Calculadora',w:300,h:440,
     html:function(){
       var rows=[
         [{l:'AC',cls:'cb-ac',fn:"cAC()"},{l:'±',cls:'cb-sp',fn:"cSign()"},{l:'%',cls:'cb-sp',fn:"cPct()"},{l:'÷',cls:'cb-op',fn:"cOp('/')"}],
@@ -725,19 +1153,71 @@ var APPS={
   },
 
   music:{
-    title:'🎵 Reproductor de Música', w:320, h:340,
+    title:'🎵 Reproductor de Música',w:340,h:420,
     html:function(){
-      return '<div class="music-wrap"><div class="mdisc" id="mus-disc">🎶</div><div style="text-align:center"><div class="mname" id="mus-name">Noche Digital</div><div class="mart" id="mus-art">NexosOS Radio</div></div><div class="mprog"><div class="mfill" id="mus-fill"></div></div><div class="mctrl"><button class="mc" onclick="mPrev()">⏮</button><button class="mc mcplay" id="mus-play" onclick="mToggle()">▶</button><button class="mc" onclick="mNext()">⏭</button></div></div>';
+      return '<div class="music-wrap">'
+        +'<div class="music-top">'
+        +'<div class="mdisc" id="mus-disc">🎵</div>'
+        +'<div style="text-align:center;width:100%;padding:0 10px;">'
+        +'<div class="mname" id="mus-name">Sin música</div>'
+        +'<div class="mart"  id="mus-art">Agrega canciones con el botón +</div>'
+        +'</div>'
+        +'<div class="mprog-wrap" style="width:100%;">'
+        +'<span class="mtime" id="mus-ct">0:00</span>'
+        +'<div class="mprog" id="mprog-bar" onclick="mSeek(event)"><div class="mfill" id="mus-fill"></div></div>'
+        +'<span class="mtime" id="mus-dt">0:00</span>'
+        +'</div>'
+        +'<div class="mctrl">'
+        +'<button class="mc" onclick="mPrev()">⏮</button>'
+        +'<button class="mc mcplay" id="mus-play" onclick="mToggle()">▶</button>'
+        +'<button class="mc" onclick="mNext()">⏭</button>'
+        +'</div>'
+        +'</div>'
+        +'<div class="music-bottom">'
+        +'<button class="music-add-btn" onclick="mAddFiles()">➕ Agregar música desde tu dispositivo</button>'
+        +'<div class="music-playlist" id="mus-playlist"></div>'
+        +'</div></div>';
     },
-    ready:function(){ mSetUI(); }
+    ready:function(){ mUpdateUI(); }
+  },
+
+  wiki:{
+    title:'🌐 Wikipedia',w:740,h:540,
+    html:function(){
+      return '<div class="wiki-wrap">'
+        +'<div class="wiki-bar">'
+        +'<img class="wiki-logo-img" src="https://es.wikipedia.org/static/images/icons/wikipedia.png" onerror="this.style.display=\'none\'">'
+        +'<input id="wiki-q" type="text" placeholder="Buscar en Wikipedia..." onkeydown="wikiKeydown(event)">'
+        +'<button class="wiki-lang-btn on" data-lang="es" onclick="wikiSetLang(\'es\')">ES</button>'
+        +'<button class="wiki-lang-btn" data-lang="en" onclick="wikiSetLang(\'en\')">EN</button>'
+        +'<button class="wiki-btn" onclick="wikiSearch()">🔍 Buscar</button>'
+        +'</div>'
+        +'<div class="wiki-result" id="wiki-result">'
+        +'<div class="wiki-home">'
+        +'<div class="wiki-big">🌐</div>'
+        +'<h2>Wikipedia en NexosOS</h2>'
+        +'<p>Busca cualquier tema y obtén el artículo completo.<br>Puedes buscar en español o en inglés.</p>'
+        +'<div class="wiki-sugs">'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Colombia\')">🇨🇴 Colombia</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Barranquilla\')">🏙️ Barranquilla</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Inteligencia artificial\')">🤖 IA</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Sistema operativo\')">💻 Sistema Operativo</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Universo\')">🌌 Universo</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Fútbol\')">⚽ Fútbol</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Python (lenguaje)\')">🐍 Python</button>'
+        +'<button class="wiki-sug" onclick="wikiSuggest(\'Historia de América\')">🌎 América</button>'
+        +'</div></div></div></div>';
+    },
+    ready:function(){ var q=document.getElementById('wiki-q'); if(q) q.focus(); }
   },
 
   settings:{
-    title:'⚙️ Ajustes del Sistema', w:540, h:430,
+    title:'⚙️ Ajustes del Sistema',w:540,h:440,
     html:function(){
       function tog(on){ return '<div class="tog'+(on?' on':'')+'" onclick="this.classList.toggle(\'on\')"><div class="tth"></div></div>'; }
       function row(l,on){ return '<div class="set-row"><span class="set-rl">'+l+'</span>'+tog(on)+'</div>'; }
       function kv(k,v){ return '<div class="set-row"><span class="set-rl">'+k+'</span><span style="font-size:12px;color:rgba(255,255,255,.45)">'+v+'</span></div>'; }
+      var notes=getSavedNotes(), apps=getCustomApps(), ml=getMusicList();
       return '<div class="set-wrap"><div class="set-nav">'
         +'<div class="sni on"  onclick="setTab(this,\'s-display\')">🖥️ Pantalla</div>'
         +'<div class="sni"     onclick="setTab(this,\'s-sound\')">🔊 Sonido</div>'
@@ -745,47 +1225,52 @@ var APPS={
         +'<div class="sni"     onclick="setTab(this,\'s-privacy\')">🔒 Privacidad</div>'
         +'<div class="sni"     onclick="setTab(this,\'s-about\')">ℹ️ Acerca de</div>'
         +'<div style="flex:1"></div>'
-        +'<div class="sni" style="background:rgba(99,102,241,.18);color:#a5b4fc;margin-top:8px;" onclick="openApp(\'store\')">🚀 Apps Lanzadas</div>'
-        +'</div>'
+        +'<div style="padding:6px;border-top:0.5px solid rgba(255,255,255,.06);margin-top:4px;display:flex;flex-direction:column;gap:4px;">'
+        +'<div class="sni" style="background:rgba(255,255,255,.04)" onclick="openApp(\'wiki\')">'
+        +'<img src="https://es.wikipedia.org/static/images/icons/wikipedia.png" style="height:18px;border-radius:3px;opacity:.8" onerror="this.outerHTML=\'<span>🌐</span>\'">'
+        +'<span style="font-size:12px;color:rgba(255,255,255,.65)">Wikipedia</span></div>'
+        +'<div class="sni" style="background:rgba(99,102,241,.18);color:#a5b4fc" onclick="openApp(\'store\')">🚀 Apps Lanzadas</div>'
+        +'</div></div>'
         +'<div class="set-body">'
         +'<div id="s-display"><div class="set-title">Pantalla</div><div class="set-sec"><div class="set-lbl">Apariencia</div>'+row('Modo oscuro',true)+row('Transparencia',true)+row('Animaciones',true)+row('Fuente grande',false)+'</div><div class="set-sec"><div class="set-lbl">Brillo</div><div class="set-row"><input type="range" class="sslider" min="10" max="100" value="80"></div></div></div>'
-        +'<div id="s-sound" style="display:none"><div class="set-title">Sonido</div><div class="set-sec"><div class="set-lbl">Volumen</div><div class="set-row"><input type="range" class="sslider" min="0" max="100" value="70"></div>'+row('Sonidos del sistema',true)+row('Notificaciones',true)+'</div></div>'
+        +'<div id="s-sound" style="display:none"><div class="set-title">Sonido</div><div class="set-sec"><div class="set-lbl">Volumen</div><div class="set-row"><input type="range" class="sslider" id="sys-vol" min="0" max="100" value="100" oninput="if(audioEl)audioEl.volume=this.value/100"></div>'+row('Notificaciones',true)+'</div></div>'
         +'<div id="s-network" style="display:none"><div class="set-title">Red</div><div class="set-sec">'+row('Wi-Fi',true)+row('Bluetooth',false)+row('VPN',false)+row('Modo avión',false)+'</div></div>'
         +'<div id="s-privacy" style="display:none"><div class="set-title">Privacidad</div><div class="set-sec">'+row('Historial',false)+row('Diagnósticos',true)+row('Telemetría',false)+'</div></div>'
-        +'<div id="s-about" style="display:none"><div class="set-title">Acerca de NexosOS</div><div class="set-sec">'+kv('Sistema','NexosOS')+kv('Versión','1.0.0 (Build 2026)')+kv('Procesador','Nexos x86-64')+kv('RAM','8 GB')+kv('Almacenamiento','256 GB SSD')+kv('Kernel','NexosKernel 5.0')+'</div></div>'
+        +'<div id="s-about" style="display:none"><div class="set-title">Acerca de NexosOS</div><div class="set-sec">'+kv('Sistema','NexosOS 1.0.0')+kv('Usuario activo',currentUser)+kv('Notas guardadas',notes.length+' archivo(s)')+kv('Música guardada',ml.length+' pista(s)')+kv('Apps instaladas',apps.length+' app(s)')+kv('Kernel','NexosKernel 5.0')+kv('Arquitectura','x86_64')+'</div></div>'
         +'</div></div>';
     }
   },
 
   store:{
-    title:'🚀 Apps Lanzadas', w:640, h:460,
+    title:'🚀 Apps Lanzadas',w:660,h:480,
     html:function(){
+      appImgData='';
       return '<div class="store-wrap">'
         +'<div class="store-tabs">'
-        +'<button class="stab on" id="tab-apps"   onclick="storeTab(this,\'sp-apps\')">📱 Apps instaladas</button>'
-        +'<button class="stab"    id="tab-add"    onclick="storeTab(this,\'sp-add\')">➕ Agregar App</button>'
+        +'<button class="stab on" id="tab-apps" onclick="storeTab(this,\'sp-apps\')">📱 Apps instaladas</button>'
+        +'<button class="stab"    id="tab-add"  onclick="storeTab(this,\'sp-add\')">➕ Agregar App</button>'
         +'</div>'
-        // Panel apps
-        +'<div class="store-panel" id="sp-apps">'
-        +'<div id="apps-grid" class="app-grid"></div>'
-        +'</div>'
-        // Panel agregar
+        +'<div class="store-panel" id="sp-apps"><div id="apps-grid" class="app-grid"></div></div>'
         +'<div class="store-panel" id="sp-add" style="display:none">'
         +'<div class="add-form">'
-        +'<div><label>Nombre de la app</label><input id="app-name" type="text" placeholder="Mi App Genial" maxlength="30"></div>'
-        +'<div><label>Emoji / Logo (un emoji)</label><input id="app-ico" type="text" placeholder="🔵" maxlength="4" style="width:80px;font-size:20px;text-align:center;"></div>'
-        +'<div><label>Código HTML de la app</label><textarea id="app-html" placeholder="&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;body style=&quot;background:#1a1a2e;color:#fff;padding:20px;font-family:sans-serif;&quot;&gt;\n  &lt;h1&gt;Mi App&lt;/h1&gt;\n  &lt;p&gt;Contenido aquí...&lt;/p&gt;\n&lt;/body&gt;\n&lt;/html&gt;"></textarea></div>'
-        +'<button class="add-btn" onclick="addApp()">🚀 Instalar App</button>'
-        +'<div style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:4px;">La app aparecerá en el escritorio y en el menú inicio</div>'
+        +'<div><label>Nombre de la app</label><input id="app-name" type="text" placeholder="Mi App..." maxlength="30"></div>'
+        +'<div><label>Imagen / logo (desde explorador de archivos)</label>'
+        +'<div class="img-upload-area" onclick="appPickImage()">'
+        +'<img id="app-img-preview" class="img-preview" style="display:none">'
+        +'<div class="img-upload-txt" id="app-img-txt">Haz clic para subir imagen desde tu explorador de archivos</div>'
         +'</div></div>'
-        +'</div>';
+        +'<div><label>Código HTML completo de la app</label>'
+        +'<textarea id="app-html" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;&#10;&lt;body style=&quot;background:#1a1a2e;color:#fff;padding:20px&quot;&gt;&#10;  &lt;h1&gt;Mi App&lt;/h1&gt;&#10;&lt;/body&gt;&#10;&lt;/html&gt;"></textarea></div>'
+        +'<button class="add-btn" onclick="addApp()">🚀 Instalar App en NexosOS</button>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:4px;">Se guarda automáticamente · Aparece en escritorio, menú inicio y archivos</div>'
+        +'</div></div></div>';
     },
     ready:function(){ storeRender(); }
   }
 };
 
-// ══════════════ BOOT ══════════════
-setTimeout(function(){ notify('✅','NexosOS listo','Doble clic en los íconos para abrir apps.'); },700);
+// ═══ BOOT ═══
+loginInit();
 </script>
 </body>
 </html>
